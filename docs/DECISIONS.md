@@ -6981,4 +6981,260 @@ current release; a deck written by an older shell and read against a newer
 schema only ever gains optional keys, by additivity, so the unpinned form is
 correct for validation and the pinned twins exist for anyone who wants
 exactness.
+## 2026-09-15 — Maths: an in-house engine replaces Temml, and reads Typst
+
+Temml (64 KB compressed, ~10% of the shell) rendered `$…$` to MathML. It is
+gone; `slides/src/maths/` does the job — parse → one shared tree → MathML
+emitter, a LaTeX front end and a Typst front end over ONE symbol table
+(LaTeX name / Typst name / code point). Nothing in the file format changes:
+the document stores the source the author typed, as it always did.
+
+**Measured first, then built.** Every `$…$` in the starter deck, the gallery
+decks, the guestbook and every rig fixture: 6 distinct formulas — fractions,
+roots, scripts, `\left\right`, `\pm`. The gallery and guestbook decks carry
+no maths at all. So the engine's supported set is the obvious tier over that,
+not a cut of anything measured: fractions and roots, scripts and limits,
+`\left\right` and the `\big` family, matrices/cases/aligned, accents and
+braces, `\mathbb`/`\mathcal`/`\mathfrak` as Unicode code points (Chrome
+ignores `mathvariant`), `\text`, `\textcolor`, `\boxed`. Not covered:
+`\substack`, `\xrightarrow`, `\ce`, `\tag`, `\hline` — a formula using them
+renders as typed, exactly as any TeX Temml refused did.
+
+**Compared, in Chrome, 91 formulas** (the 11 from our corpus + 80 from the
+categories of Temml's supported-functions page): normalised MathML trees
+identical on 96.6%, rendered ink identical (<0.5% pixels) on 97.8%. Three
+rounds closed every divergence that was ours by adopting Temml's metric
+(`\mid`, `\!`, function application, upright Greek capitals, primes, `\iff`,
+`\boxed`, accent sizes, the 2 px on every matrix cell). What remains is
+Temml's: `\overline`/`\underline` via `menclose`, which Chrome does not draw
+— we draw the rule, a fix; and one extra `mrow` level with 0.0% pixel change.
+
+**`cases` and `aligned` centre their columns.** TeX left-aligns them; Temml
+does too — through a stylesheet Bento never loaded, so every deck to date
+rendered them centred. Measured `mtd` offsets: ours `[0, 20.2]`, Temml's
+`[10.1, 10.1]`. The maintainer looked at both on the demo deck and chose
+centred: it matches every existing deck, and it looks better. Recorded so
+nobody "fixes" it back to TeX.
+
+**Typst input, syntax A.** `$typst: a/b$` and `$$typst: …$$` — the marker is
+`typst:` immediately after the opening delimiter, case-sensitive, optional
+whitespace after the colon. Chosen over a per-document setting because it
+costs the format nothing (the marker is text), a mixed deck works formula by
+formula, and an older shell shows `$typst: a/b$` literally — degraded,
+legible, the same promise `$…$` already makes. A per-document default can be
+added later without contradicting this; the marker would still override it.
+Typst and LaTeX agree on the shared tree for 122/122 equivalence cases once
+Typst's paren groups (which script the whole group — a real semantic
+difference, not a bug) are folded.
+
+**Trust is structural.** Temml ran with `trust:false` so `\href` was inert.
+The emitter constructs every attribute itself; the one place author text
+reaches a `style` attribute — `\textcolor` — accepts only a CSS colour shape
+(hex, a name, `rgb()`/`hsl()` over numbers). The rig throws `\href`,
+`onload=`, `<script>` and a `url(` colour at it and asserts every emitted
+attribute is on the engine's own list.
+
+**The rig holds the comparison without Temml.** Temml's trees for the 91
+formulas were frozen the day it left (`scripts/maths-freeze-reference.ts` →
+`scripts/fixtures/maths-reference.json`, Temml 0.13.3). `scripts/
+test-maths-lite.ts` compares the engine's trees to them and requires ≥95%
+identical AND every mismatch to be on the explicit residual list — a printer
+change that moves a glyph fails CI, not a slide. Pixels stay out of CI: they
+were measured in the spike and there is no Temml left to draw the other side.
+
+**Numbers.** Engine 775 lines, 24 KB minified, 8.3 KB gzip. Shell on the day
+it shipped (#485, against main 131015e): 756,103 → 690,067 B compressed
+(−66,036 B, −8.7%). The spike that measured all of the above was PR #483
+(closed, three rounds).
+
+## 2026-09-16 — The shell starts the way nothing refuses, and carries its runtime in base86
+
+A .bento.html attached in Microsoft Teams stopped opening once the shell was
+compressed (1.0.x). The maintainer tested seven loader variants in Teams,
+each with a marker on the first slide, and the results decided the loader:
+
+| variant | open pane | preview pane |
+| --- | --- | --- |
+| A — 1.1.0 shell, module import from a `blob:` URL | blank | blank |
+| B — the runtime inserted as an inline module script | splash only | works |
+| B2 — B plus an on-page diagnostic panel | splash only | works |
+| B3 — B plus `trustedTypes.createPolicy` at boot | splash only | blank |
+| B4 — inline first, then `new Function`, then blob; eager policies | works | blank |
+| B5 — `new Function('')` probe first, then inline; eager policies | works | blank |
+| B6 — B5 with the policies made lazy | works | blank |
+| C — the uncompressed build, every script parser-inserted | works | works |
+
+**Two panes, two policies.** The open pane sends a header policy that allows
+the file's own inline scripts by sha256 hash plus `'unsafe-eval'` (hashes
+present, so `'unsafe-inline'` is ignored per spec), no `blob:`, a sandbox
+without `allow-same-origin`, `connect-src 'none'`. C works there because
+every script it has is parser-inserted and hashed; A fails on `blob:`; B
+fails because an inserted script is unhashed. Reproduced locally
+(`scripts/loader-csp-server.py --hash`) before anything was built on it.
+The preview column is recorded as observed but is NOT evidence — see
+"The preview pane is not deterministic" below; every decision here rests on
+the open pane, which answered the same way on every upload.
+
+**Consequence: no probing.** The loader does first the one thing refused
+nowhere — insert the inline module, exactly as B — a step that a hashing
+policy refuses with a report and nothing accepts silently, so the cascade
+never guesses; it reaches for anything else only after a `securitypolicyviolation` attributed to that attempt
+(matched by `blockedURI`, not by timing: the eval probe's own violation
+arrives a task later and was once read as the inline attempt failing):
+then `new Function("'use strict';" + js)()` — an indirect eval, ungoverned
+by script hashes and allowed by `'unsafe-eval'`; the bundle has no top-level
+`import`, `export` or `await`, so it is a classic function body, and a
+`//# sourceURL=bento-slides.js` names it in DevTools — then the blob import.
+Trusted Types policies (`bento` for the script sink, `default` because the
+renderer and the save path assign `innerHTML` and `script.text` from strings)
+are created only after a sink throws the TypeError that names them, and that
+step is retried once. The loader counts violations from its first statement
+and records `{ path, tried, tt, violations }` on `window.bento.loader`.
+Measured under five local policies: zero violations wherever inline is
+allowed; path `function` under the open-pane policy; the lazy install under
+enforced Trusted Types.
+
+**Cost.** Boot to editor mount in plain Chrome, twelve interleaved runs:
+1.1.0 loader median 404 ms, this loader 421 ms (b64) / 367 ms (b86). The
+inline-module path parses the bundle the same way the blob import did; the
+eval-first order was ~80 ms quicker but probes (kept as
+`--loader cascade-eval-first` for the record).
+
+**Encoding.** Every shell byte is paid per send, so the two payload blocks
+moved from base64 to base86: printable ASCII 0x21–0x7E minus `<` `>` `&`
+`"` `'` `\` `-` `{` — 86 symbols, so `</script`, `<!--`, `-->`, `]]>` and
+`${` are unproducible by construction (asserted by the gate on every payload
+and by a 10,000-buffer rig). Four bytes in five characters: 6.4 bits per
+character against base64's 6, a payload ×1.25 instead of ×1.333 — 6.25%
+smaller; the theoretical limit for 86 symbols is 6.43 bits, so 4→5 is within
+0.4% of it and a 7→9 group (6.22 bits/char) would be WORSE, not better —
+larger groups buy nothing here. Block type `bento/deflate-b86`; the gate,
+the site scripts and the loader read both types. Measured on the release
+shell: 699,847 → 661,768 B (−38,079, −5.4% of the file; the payloads
+themselves −6.25%). The in-page decoder — a 128-entry lookup and 32-bit
+groups — takes 11 ms on the runtime payload against 47 ms for
+`Uint8Array.from(atob(...))`, so the smaller file also boots sooner.
+
+**Set aside, measured.** Alternative carriers (`<template>`, `text/plain`)
+and a plain-JavaScript inflater for hosts without DecompressionStream stay
+as opt-in flags (`--carrier`, `--inflate`), built because the delivery of
+the payload was once the hypothesis; the diagnostic panel showed the
+payload found and inflated in Teams, so neither is needed there.
+
+**No request from an embedded view.** The open-pane diagnostic panel, read
+in Teams, ended with `connect-src` violations for the launch update check —
+a request the policy forbids and the app has no business making from a
+frame that cannot store the answer. kernel `net.ts` now
+decides once at boot whether the document is an embedded view and `netFetch` /
+`netWebSocket` — the one place the app touches the network — refuse before
+any request. The decision needs ALL THREE signs — framed (`self !== top`),
+an opaque DOCUMENT origin (`self.origin === 'null'`) and a storage read
+throwing `SecurityError` — because the first cut ("opaque, or storage throws") would
+have switched off updates and collab for people nobody embedded: Firefox
+reports origin `null` for a file:// deck (Chromium 152 reports `file://`,
+measured, so Chromium desktops were never at risk), and so do a data: URL, a
+WebView loaded from a string with no base URL, and a top-level response under
+CSP `sandbox`; a normal tab with site data blocked throws on the storage
+read. That the Teams pane is all three is measured, not assumed: the B2
+diagnostic panel, opened in Teams by the maintainer, printed `framed`
+alongside origin `null` and the storage `SecurityError`. The origin sign
+reads `self.origin`, the document's origin, not `location.origin`, which is
+the URL's: measured in Chromium 152, a sandboxed frame loaded by `src`
+reports its http origin in `location.origin` while `self.origin` is `null`
+(a `srcdoc` or `data:` frame says `null` in both — the B2 panel probed
+`location.origin` and printed `null`, so that is how the Teams pane loads
+the file). On `location.origin` the local sandboxed-iframe harness was not
+sandboxed at all and made the manifest request; on `self.origin` it is, and a top-level file:// deck (Chromium:
+`self.origin` `null`, `location.origin` `file://`) still is not, because
+it is not framed. The rig probes each
+sign alone and in pairs in child processes (the decision is cached per
+process) and asserts only the triple is sandboxed. The refusal is terminal —
+a frame's sandboxing does not change while it lives — so the transport must
+not retry a `SandboxedError` (kernel's change in `sync/online.ts`, on top of
+this one). With the fix: the launch check, the relay join and the pack listing never
+start, the About dialog says "Updates are not checked inside an embedded
+view", and `window.bento.sandboxed` exposes the decision. Measured: a plain
+tab makes exactly one manifest request at launch; the sandboxed frames make
+none and raise no violation after boot over five seconds. Storage still does
+not persist there — autosave and preferences are per visit — and that is
+stated in the changelog line. Previews are untouched:
+`preview.ts`, the remover and the gate's preview-carrying-shell invariant
+are not part of this change, and the thumbnailers that render the preview
+run no script at all.
+
+**The preview pane is not deterministic.** Eleven more files were built to
+bisect why the preview card stayed blue for base86 when it had rendered the
+editor for base64 (B7): base86 minus one candidate symbol at a time (`%`,
+`*`, `?`, `#`, `:`, `@`), minus `?` and `#`, and minus the six URL
+delimiters (`% : / ? # @`, 80 symbols, 7→9 groups). Round seven settled
+it: B11d (no `:`) and B11e (no `@`) rendered the editor on first upload and
+were blue on a second upload of the SAME bytes, and B7 — the editor
+yesterday — was blue today. The preview pane's outcome varies between
+uploads of identical bytes, so no conclusion about any character stands,
+including B10b's one-time success; the earlier reading of blank preview
+cards as "a reported violation is fatal" is withdrawn on the same ground.
+The open pane has been deterministic throughout: base86 + this cascade +
+`sandboxed()` open there every time. The counts below are kept as data —
+what each alphabet exposes in the real runtime payload — with no inference
+drawn from them:
+
+| payload | chars | `/*` | `*/` | `//` | `%xx` | `://` | `?x=` | `#`+alnum | `@`+alnum |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| b64 | 660,200 | 0 | 0 | 227 | 0 | 0 | 0 | 0 | 0 |
+| b86 | 618,937 | 82 | 90 | 72 | 486 | 2 | 249 | 5,240 | 5,416 |
+| b80 | 636,621 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+**The tell, and the mechanism.** Blue preview cards showed the splash with
+no mark, wordmark or bar — every one of those begins at opacity 0 and
+animates in — so the card was rendered by a document whose animations never
+advanced: a hidden document. Chrome measured in a background tab (CDP,
+Chromium 152): CSS animations hold their first frame, `requestAnimationFrame`
+never fires, `setTimeout(25)` fires after 675 ms, decoding runs 4–6× slower;
+`setTimeout(0)`, promises and an inserted script's execution are prompt.
+Against that, the two files that differed in Teams differed exactly here:
+the uncompressed build's runtime is a parser-inserted script, so its editor
+is mounted BEFORE DOMContentLoaded (measured: mounted at DCL, 105 ms hidden);
+the compressed shell's loader awaited `DecompressionStream` and then
+inserted a `type="module"` script — both land in later tasks — so `load`
+fired at 12 ms with nothing mounted and the editor arrived ~300 ms later
+hidden (A: 292–437 ms, B7-b86: 287–364 ms). A viewer that renders the
+document off-screen and captures it around `load` sees the splash from the
+compressed file and the editor from the uncompressed one, and the race
+between its capture and a throttled task is the nondeterminism observed.
+Then the splash: `main.ts` held it on a 1250 ms timer and removed it 550 ms
+after adding the fade class — two timers a hidden document throttles (splash
+gone at 2.4–2.9 s hidden against 1.8 s visible, for every build including
+the uncompressed one), so a deck opened in a background tab showed its splash
+until it was looked at.
+
+**Consequence: mounted before `load`, and the splash never waits.** The
+loader now decodes and inflates synchronously — the ~2 KB JavaScript
+inflater that was an opt-in flag, 18 ms on the runtime payload against
+`DecompressionStream`'s 6 (99 against 18 hidden) — and runs the runtime as
+an inline CLASSIC script, which executes inside `appendChild`; whether the
+policy took it is known when the call returns, so no wait, no violation
+listener on the critical path. Then `new Function`, also synchronous; the
+blob import is the one promise and the last resort. Measured: the compressed
+shell mounts at 123 ms visible / 138 ms hidden, before DOMContentLoaded in
+both, as the uncompressed build does; the old loader 109 / 287 ms, after
+`load`. The splash is removed at once when `document.hidden`, on a
+`visibilitychange` to hidden, or — visible — after a hold capped at 800 ms
+from navigation and a fade that ends by timer or `transitionend`, whichever
+first: gone 2 ms after the mount hidden, 1,241 ms after it visible. The rig
+drives headless Chrome with a real background tab (a decoy tab activated
+before navigation) and asserts both, plus that the built loader contains no
+`requestAnimationFrame`, `setTimeout`, `setInterval`, `fonts.ready` or
+`DOMContentLoaded` and exactly one `await`. The editor's own boot was
+audited for the same waits: `main.ts` reaches `new Editor` and
+`window.bento` synchronously from the doc; the constructor builds the whole
+UI synchronously; the canvas renders in its constructor and only its
+re-scale rides a `ResizeObserver`; `fitTopbar` measures synchronously once
+and re-measures on observers; the launch update check sits on a 1.5 s
+timer that is off the mount path; nothing awaits a frame or a font before
+the app exists.
+
+The experimental alphabets stay in `scripts/lib/b86.mjs` behind
+`--encoding` (`makeCodec` is build-side only; the shipped loader carries
+the b86 decoder alone, verified by grep on the built shell), and the
+diagnostic panel stays behind `--diag`. Default: b86, cascade, no panel.
 

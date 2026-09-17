@@ -44,9 +44,9 @@ ok(inserted.align === 'right' && inserted.lineHeight === 1.35, 'Farsi editor ins
 for (const size of [{ width: 1600, height: 900 }, { width: 1280, height: 720 }]) {
   const placeholders = builtinLayouts(size).flatMap((layout) =>
     instantiateLayout(layout).elements.filter((e): e is TextElement => e.type === 'text' && !!e.placeholder))
-  ok(placeholders.length > 0 && placeholders.every((e) => e.align === 'right'),
-    `new built-in placeholders match Farsi alignment at ${size.width}×${size.height}`)
-  const headings = placeholders.filter((e) => e.role !== 'body')
+  ok(placeholders.length > 0 && placeholders.every((e) => e.align === (e.role === 'image' ? 'center' : 'right')),
+    `text placeholders match Farsi alignment and image slots stay centered at ${size.width}×${size.height}`)
+  const headings = placeholders.filter((e) => ['title', 'subtitle', 'kicker', 'attribution', 'image'].includes(e.role ?? ''))
   ok(headings.length > 0 && headings.every((e) => e.lineHeight === 1.35),
     `placeholder default line height matches Farsi inserts at ${size.width}×${size.height}`)
   const bodies = placeholders.filter((e) => e.role === 'body')

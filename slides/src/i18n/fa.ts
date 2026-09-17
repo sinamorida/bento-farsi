@@ -941,6 +941,7 @@ export const fa: Catalog = {
   "Double-headed": "دو سر",
   "Copy compact JSON (for agents)": "کپی JSON فشرده (برای عامل‌ها)",
   "The same deck with every default left out — the shape an AI agent should write. Replace from JSON takes it back; the saved file is always full.": "همان دک بدون هیچ مقدار پیش‌فرض؛ شکلی که یک عامل هوش مصنوعی باید بنویسد. «جایگزینی از JSON» آن را می‌پذیرد؛ پروندهٔ ذخیره‌شده همیشه کامل است.",
+  "Updates are not checked inside an embedded view — open the file in a browser tab to check.": "در نمای جاسازی‌شده به‌روزرسانی‌ها بررسی نمی‌شوند — برای بررسی، پرونده را در یک زبانهٔ مرورگر باز کنید.",
   "Compact JSON copied": "JSON فشرده کپی شد",
   "Loaded: {dropped} fields dropped, {warnings} warnings — see console": "بارگذاری شد: {dropped} فیلد حذف شد، {warnings} هشدار — کنسول را ببینید",
 }

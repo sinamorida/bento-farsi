@@ -1366,6 +1366,14 @@ jobs:
         # step. Decisions in slides/src/steps.ts, DOM-free (#282, option 2).
         run: node scripts/test-slides-steps.ts
 
+      - name: Maths engine rig
+        # slides/src/maths replaced Temml (2026-09-15): never-throws contract;
+        # the 91-formula reference set matches Temml's FROZEN trees on ≥95%
+        # (scripts/fixtures/maths-reference.json; every mismatch must be a
+        # listed residual); Typst ≡ LaTeX on the shared tree; every emitted
+        # attribute is the engine's own; the symbol table has no duplicates.
+        run: node scripts/test-maths-lite.ts
+
       - name: Reveal authoring rig
         # Reading order (top-to-bottom, then left-to-right, rows by vertical
         # overlap) is deterministic; the verbs continue the slide's sequence;
@@ -1380,6 +1388,24 @@ jobs:
         # routes the argument. Bare {{date}} stays viewer-locale (#381).
         run: node scripts/test-slides-fields.ts
 
+      - name: Shell loader and carrier rig
+        # base86 payloads (scripts/lib/b86.mjs) round-trip and can never
+        # contain </script, <!--, -->, ]]> or ${; the loader inflates
+        # synchronously and runs the runtime as an inline classic script
+        # FIRST (mounted before DOMContentLoaded, as the uncompressed build
+        # is), probes and waits on nothing, falls to new Function then blob
+        # only on a refusal, installs Trusted Types policies lazily, and
+        # records window.bento.loader. The gate goes red on a hand-edited
+        # payload. The browser half drives headless Chrome with a real
+        # background tab: mounted before DCL hidden, splash gone within 50 ms
+        # of the mount there. Needs slides/node_modules and the built shell.
+        run: node scripts/test-shell-loader.ts
+
+      - name: Maths in links rig
+        # resolveMath transforms text runs only: a `$` inside an href never
+        # pairs with one in the text, so a link whose address carries a
+        # dollar sign keeps its href (pre-existing since #465).
+        run: node scripts/test-slides-math-href.ts
       - name: Compact document rig
         # The agent authoring form (#422): compactDoc/expandDoc are inverses
         # on the starter deck, expansion equals the editor's insert helpers
@@ -1395,6 +1421,14 @@ jobs:
         run: |
           slides/node_modules/.bin/esbuild scripts/test-slides-agent-decks.ts --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/test-slides-agent-decks.mjs"
           node "$RUNNER_TEMP/test-slides-agent-decks.mjs"
+
+      - name: Compact layouts and roles rig
+        # A compact slide names a layout and its elements carry roles: the
+        # layout's frames through model.ts applyLayout (the editor's own
+        # path), ids kept so same-layout slides morph, unknown roles fall
+        # back and are reported, explicit geometry wins, bodies stack, and
+        # AGENTS.md's layout table is checked against the code.
+        run: node scripts/test-slides-compact-layouts.ts
 
       - name: Gate parity rig (the load-report collector changes no decision)
         # main's untrusted.ts frozen from git at rig time and bundled beside

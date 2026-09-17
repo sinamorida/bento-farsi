@@ -15,11 +15,11 @@ import {
 } from './save'
 import { maybeShowReturnGate } from './editor/returngate'
 import { buildSlidePreview } from './preview'
-import { APP_VERSION, checkForUpdates, buildUpdatedFile, applyUpdate } from './update'
+import { APP_VERSION, checkForUpdates, buildUpdatedFile, applyUpdate, sandboxed } from './update'
 import { i18nApi, t, applyDirection } from './i18n'
 import { parseDoc, type BentoDoc, type TextElement } from './model'
 import { compactJson } from './compact'
-import { parseDocInputReport, fitAutoHeights, type LoadReport } from './compactload'
+import { parseDocInputReport, fitAutoHeights, restack, type LoadReport } from './compactload'
 import { validateDoc, type ValidateOpts } from './validate'
 import { buildSchema } from './schema'
 import { resolveThemeRefs } from './palette'
@@ -264,19 +264,21 @@ if (location.hash === '#present') {
 }
 
 // Dismiss the boot splash (inline in index.html so it paints before this
-// bundle parses). Hold it briefly so the assemble animation reads as a
-// brand moment instead of a flicker; the pristine capture ran before this,
-// so saved files keep the splash for their own next boot.
-{
-  const splash = document.getElementById('bento-splash')
-  if (splash) {
-    const wait = Math.max(0, 1250 - performance.now())
-    setTimeout(() => {
-      splash.classList.add('done')
-      setTimeout(() => splash.remove(), 550)
-    }, wait)
-  }
-}
+// bundle parses). The pristine capture ran before this, so saved files keep
+// the splash for their own next boot. Visible, it is held briefly so the
+// assemble animation reads as a brand moment instead of a flicker — but
+// the hold is a capped timer that a visibility change cuts short, and
+// removal never waits on an animation or transition: a HIDDEN document
+// (a background tab; a viewer rendering the file off-screen for a preview
+// card) freezes CSS animations at their first frame, delivers no frames,
+// and throttles timers to a wakeup a second or none at all — so a splash
+// that waited for its own fade to end stayed over the mounted editor for
+// as long as nobody looked, and Teams' preview card showed the splash with
+// the mark still at opacity 0 (measured: identical bytes previewed on one
+// upload and not the next, the race being the pane's capture against a
+// throttled timer). Hidden, the splash goes the moment the editor exists.
+dismissSplash()
+
 
 // Small scripting surface for tooling and automation: read/replace the
 // document model and serialize the full .bento.html file.
@@ -340,7 +342,7 @@ if (location.hash === '#present') {
       void document.fonts.ready.then(() => {
         if (store.doc !== parsed.doc) return // the deck moved on
         const n = fitAutoHeights(store.doc, { autoHeight: parsed.report.refit })
-        if (n) store.commit(() => {})
+        if (n) { restack(store.doc, { stacks: parsed.report.stacks }); store.commit(() => {}) }
       })
     }
     return parsed.report
@@ -388,6 +390,10 @@ if (location.hash === '#present') {
    * returns the updated file's html (this doc inside the new shell);
    * apply() downloads it. check(url) accepts an override for testing.
    */
+  /** true inside an embedded view (a sandboxed frame — Teams, SharePoint):
+   *  no update check, no network at all from the app; storage does not
+   *  persist. Decided once at boot by kernel net.ts sandboxed(). */
+  sandboxed: sandboxed(),
   updates: {
     version: APP_VERSION,
     check: (url?: string) => checkForUpdates(url),
@@ -437,3 +443,33 @@ if (location.hash === '#present') {
 }
 
 } // editorMode
+
+/**
+ * Remove the boot splash: at once when the document is hidden, else after a
+ * capped hold that a visibilitychange cuts short. The fade is a CSS
+ * transition; removal follows it by a timer OR transitionend, whichever
+ * comes first, and never depends on either alone.
+ */
+function dismissSplash() {
+  const splash = document.getElementById('bento-splash')
+  if (!splash) return
+  let gone = false
+  const remove = () => {
+    if (gone) return
+    gone = true
+    document.removeEventListener('visibilitychange', onVisibility)
+    splash.remove()
+  }
+  const fade = () => {
+    if (gone) return
+    if (document.hidden) { remove(); return }
+    splash.classList.add('done')
+    splash.addEventListener('transitionend', remove, { once: true })
+    setTimeout(remove, 550)
+  }
+  const onVisibility = () => { if (document.hidden) remove() }
+  document.addEventListener('visibilitychange', onVisibility)
+  if (document.hidden) { remove(); return }
+  // the brand hold, at most: 800 ms after navigation, visible only
+  setTimeout(fade, Math.max(0, 800 - performance.now()))
+}
