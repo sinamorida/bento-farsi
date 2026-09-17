@@ -1058,12 +1058,16 @@ export function cssNum(v: unknown, fallback: number, max = 4096): number {
  * An author font stack, reduced to what a stylesheet can hold. Rejected by
  * CHARACTER rather than by allowlist, unlike cssColor: font names are ordinary
  * words in any script (`ヒラギノ角ゴ` is a font family), so the test is for the
- * few characters that end a declaration or start a fetch.
+ * few characters that end a declaration or start a fetch. The length bound is
+ * not that guard — the character class is — it only keeps a style attribute
+ * from growing without limit, so it has to sit above the longest legitimate
+ * stack an app actually ships: the Persian default in model.ts is ~190 chars,
+ * and decks saved with it must keep rendering their tables in it.
  */
 function cssFont(v: unknown, fallback: string): string {
   if (typeof v !== 'string') return fallback
   const s = v.trim()
-  if (!s || s.length > 160) return fallback
+  if (!s || s.length > 256) return fallback
   return /[;{}<>()\\]/.test(s) ? fallback : s
 }
 
