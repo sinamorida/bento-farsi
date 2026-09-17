@@ -48,7 +48,10 @@
 import { previewAllowed, previewIsSafe, setEncryptionPassword } from '../kernel/src/save.ts'
 import { previewMarkup, cssColor, byteLength, PREVIEW_BUDGET } from '../dash/src/preview.ts'
 import { FORMAT, FORMAT_VERSION, type DashDoc, type Sheet } from '../dash/src/model.ts'
+import { pinEnglish } from './lib/pin-en.ts'
 
+
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 let failures = 0
 let checks = 0
 function ok(cond: boolean, msg: string) {

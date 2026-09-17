@@ -35,10 +35,12 @@
 // position quietly dropped from an inverse.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // tabs.ts imports its stylesheet, which is Vite's job and not Node's. Stub the
 // extension rather than moving the import out of the module — the same stub
 // test-dash-panels.ts uses, and for the same reason.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -59,6 +61,7 @@ type DashDoc = import('../dash/src/model.ts').DashDoc
 type TableSheet = import('../dash/src/model.ts').TableSheet
 
 const { Store } = await import('../dash/src/store.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type Patch = import('../dash/src/store.ts').Patch
 
 let failures = 0

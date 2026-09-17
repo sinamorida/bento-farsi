@@ -51,6 +51,8 @@
 
 import { readFileSync } from 'node:fs'
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
+
 
 registerHooks({
   load(url, context, next) {
@@ -70,6 +72,7 @@ const { parseDoc } = await import('../dash/src/model.ts')
 const { Store } = await import('../dash/src/store.ts')
 const { Grid } = await import('../dash/src/grid.ts')
 const { installGridMenus, rowSpan, colSpan } = await import('../dash/src/gridmenu.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type DashDoc = import('../dash/src/model.ts').DashDoc
 type TableSheet = import('../dash/src/model.ts').TableSheet
 type MenuHooks = import('../dash/src/gridmenu.ts').MenuHooks

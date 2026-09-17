@@ -31,10 +31,12 @@
 
 import { readFileSync } from 'node:fs'
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // recovery.ts imports its own stylesheet (and dropopen.ts reaches it through
 // recovery.ts). Vite's job; Node refuses the extension outright. Same stub
 // test-dash-about.ts uses.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) return { format: 'module', source: 'export {}', shortCircuit: true }
@@ -45,6 +47,7 @@ registerHooks({
 const { contentKey, decide, VOLATILE_KEYS } = await import('../dash/src/recovery.ts')
 const { classifyDrop, refusalFor } = await import('../dash/src/dropopen.ts')
 const { FORMAT, FORMAT_VERSION, parseDoc } = await import('../dash/src/model.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type DashDoc = import('../dash/src/model.ts').DashDoc
 type Snapshot = import('../kernel/src/autosave.ts').Snapshot
 

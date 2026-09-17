@@ -19,6 +19,9 @@ pre-1.0.
   kernel's Persian-first fallback now resolves to fa in all four apps, and the
   chrome mirrors RTL in dash and type the way spaces and slides already did —
   applied after the pristine capture, so dir/lang never reach a saved file.
+  Rigs that assert on the source strings pin English explicitly
+  (`scripts/lib/pin-en.ts`) — English is no longer reachable from
+  navigator.language once fa is carried.
 - **dash carries Brazilian Portuguese again.** The locale lists are derived
   from the catalog directories now (dash's rig/generator, spaces and type
   build scripts and the type rig), closing the incident in AGENTS.md rule 6;

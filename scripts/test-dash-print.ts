@@ -52,11 +52,13 @@
 // a `<tfoot>` that would repeat on every page.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // print.ts owns a stylesheet, and reaches grid.ts, which reaches find.ts, which
 // owns another. Resolving CSS is Vite's job and not Node's — the pattern
 // scripts/test-dash-filter.ts settled, and co-locating a component with its
 // styles is not something a rig gets to break.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -79,6 +81,7 @@ type Sheet = import('../dash/src/model.ts').Sheet
 type TableSheet = import('../dash/src/model.ts').TableSheet
 type CanvasSheet = import('../dash/src/model.ts').CanvasSheet
 const { FORMAT, FORMAT_VERSION } = await import('../dash/src/model.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 
 let failures = 0
 let checks = 0

@@ -23,7 +23,10 @@
 
 import { parseDoc, type DashDoc, type TableSheet } from '../dash/src/model.ts'
 import { Store, applyPatch, readCell, type Patch, _internals } from '../dash/src/store.ts'
+import { pinEnglish } from './lib/pin-en.ts'
 
+
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 let failures = 0
 let checks = 0
 function ok(cond: boolean, msg: string) {

@@ -53,9 +53,11 @@
 // built from.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // grid.ts reaches find.ts, which imports its own stylesheet — Vite's job, not
 // Node's. The same stub every dash rig with a UI import uses.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -74,6 +76,7 @@ const { parseDoc } = await import('../dash/src/model.ts')
 const { Store } = await import('../dash/src/store.ts')
 const { Grid, ariaRowIndex, ariaColIndex, ariaRowCount, ariaColCount, ARIA_UNKNOWN } =
   await import('../dash/src/grid.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type DashDoc = import('../dash/src/model.ts').DashDoc
 
 let failures = 0

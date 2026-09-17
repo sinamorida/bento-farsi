@@ -88,8 +88,11 @@ const { parseDoc } = await import('../dash/src/model.ts')
 const { exportXlsx, importXlsx } = await import('../dash/src/xlsx.ts')
 const { writeZip, readZip } = await import('../dash/src/zip.ts')
 const { validateDoc } = await import('../dash/src/validate.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 
 import type { DashDoc, DataRule, TableSheet } from '../dash/src/model.ts'
+import { pinEnglish } from './lib/pin-en.ts'
+
 
 let failures = 0
 let checks = 0

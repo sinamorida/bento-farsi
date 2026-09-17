@@ -44,9 +44,11 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // tabs.ts imports its stylesheet, which is Vite's job and not Node's. The same
 // stub test-dash-tabs.ts and test-dash-panels.ts use, for the same reason.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -58,6 +60,7 @@ registerHooks({
 
 const { ACTIONS, ACTION_IDS, actionApplies, actionReason } =
   await import('../dash/src/tabs.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type ActionId = import('../dash/src/tabs.ts').ActionId
 
 let failures = 0

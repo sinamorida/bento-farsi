@@ -45,6 +45,8 @@
 //                           perfectly into a map nothing paints is invisible.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
+
 
 registerHooks({
   load(url, context, next) {
@@ -114,6 +116,7 @@ function requireGridHook(): void {
 requireGridHook()
 
 const { Grid } = await import('../dash/src/grid.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type Cell = import('../dash/src/formula.ts').Cell
 type CellSource = import('../dash/src/cellformula.ts').CellSource
 type CellRecalc = import('../dash/src/cellformula.ts').CellRecalc

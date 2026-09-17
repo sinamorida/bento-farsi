@@ -29,12 +29,14 @@
 //      question nobody asked.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // This rig reads `aggregate` out of grid.ts, and grid.ts now reaches a
 // component that imports its own stylesheet (find.ts → find.css). Resolving CSS
 // is Vite's job and not Node's — comments.ts's and panels.ts's rigs settled this
 // pattern, and co-locating a component with its styles is not something a rig
 // gets to break.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -52,6 +54,7 @@ type Predicate = import('../dash/src/filter.ts').Predicate
 type TableSheet = import('../dash/src/model.ts').TableSheet
 const { readCell } = await import('../dash/src/store.ts')
 const { aggregate, canTotal, viewStatusText } = await import('../dash/src/grid.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 
 let failures = 0
 let checks = 0

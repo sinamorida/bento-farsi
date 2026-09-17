@@ -50,9 +50,11 @@
 
 import { registerHooks } from 'node:module'
 import { readFileSync } from 'node:fs'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // The modules import their own stylesheets — Vite's job, and a file extension
 // Node refuses outright.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) return { format: 'module', source: 'export {}', shortCircuit: true }
@@ -74,6 +76,7 @@ const { doc } = installDom()
 const about = await import('../dash/src/about.ts')
 const settings = await import('../dash/src/settings.ts')
 const { parseDoc } = await import('../dash/src/model.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 
 let failures = 0
 let checks = 0

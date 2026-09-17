@@ -34,10 +34,12 @@
 
 import { readFileSync } from 'node:fs'
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // find.ts imports its stylesheet, which is Vite's job and not Node's —
 // panels.ts, comments.ts and their rigs settled this pattern; co-locating a
 // component with its styles is not something a rig gets to break.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -59,6 +61,7 @@ const { keyToAction, actionSig, describeBindings } = await import('../dash/src/s
 // this file would make of it.
 const { coerceForColumn } = await import('../dash/src/grid.ts')
 const { FormulaError } = await import('../dash/src/formula.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type Column = import('../dash/src/model.ts').Column
 type DashDoc = import('../dash/src/model.ts').DashDoc
 type TableSheet = import('../dash/src/model.ts').TableSheet

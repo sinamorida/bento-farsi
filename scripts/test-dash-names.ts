@@ -45,6 +45,8 @@
 //                                    name table is a feature nobody can see.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
+
 
 registerHooks({
   load(url, context, next) {
@@ -67,6 +69,7 @@ const { mapNames, isNameLike } = await import('../dash/src/a1.ts')
 const { parseDoc } = await import('../dash/src/model.ts')
 const { Store } = await import('../dash/src/store.ts')
 const { Grid } = await import('../dash/src/grid.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type Cell = import('../dash/src/formula.ts').Cell
 type DashDoc = import('../dash/src/model.ts').DashDoc
 type DefinedName = import('../dash/src/model.ts').DefinedName

@@ -37,9 +37,11 @@
 // What is tested is every decision the drawing is made from.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // grid.ts pulls in find.ts, which imports its stylesheet — Vite's job, not
 // Node's. Same stub every other dash rig with a UI import uses.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -66,6 +68,7 @@ type Patch = import('../dash/src/store.ts').Patch
 const { canvasCellSource, recalcWorkbook, workbookSources, cellKey } =
   await import('../dash/src/cellformula.ts')
 const { validateDoc } = await import('../dash/src/validate.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 
 let failures = 0
 let checks = 0

@@ -38,9 +38,11 @@
 // A literal can be updated to match a bug; those cannot.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // pivot.ts imports its stylesheet, which is Vite's job and not Node's — the
 // same stub test-dash-panels.ts uses, for the same reason.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -59,6 +61,7 @@ type PivotResult = import('../dash/src/pivot.ts').PivotResult
 type AggFn = import('../dash/src/pivot.ts').AggFn
 
 const { parseDoc } = await import('../dash/src/model.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type TableSheet = import('../dash/src/model.ts').TableSheet
 type ColumnData = import('../dash/src/model.ts').ColumnData
 

@@ -48,6 +48,8 @@
 
 import { registerHooks } from 'node:module'
 import { readFileSync } from 'node:fs'
+import { pinEnglish } from './lib/pin-en.ts'
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) return { format: 'module', source: 'export {}', shortCircuit: true }
@@ -64,6 +66,7 @@ const {
   CF_KINDS, blankCondFmtRule, buildCondFmtSection, condFmtPatch, readCondFmt, readOperand,
 } = await import('../dash/src/condfmtui.ts')
 const { evaluateRules } = await import('../dash/src/condfmt.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 
 let checks = 0
 let failures = 0

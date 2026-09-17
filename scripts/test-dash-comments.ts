@@ -37,10 +37,12 @@
 // broken implementations to prove each one can actually fail.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // comments.ts imports its stylesheet, which is Vite's job and not Node's —
 // panels.ts and its rig settled this pattern; co-locating a component with its
 // styles is not something a rig gets to break.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -70,6 +72,7 @@ const {
 const { buildOrder } = await import('../dash/src/filter.ts')
 const { previewMarkup } = await import('../dash/src/preview.ts')
 const { recalc } = await import('../dash/src/formula.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 
 let failures = 0
 let checks = 0

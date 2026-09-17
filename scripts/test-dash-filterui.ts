@@ -42,10 +42,12 @@
 
 import { readFileSync } from 'node:fs'
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // The menu co-locates its stylesheet (filterui.ts → filter.css) and reaches
 // grid.ts, which reaches find.css. Resolving CSS is Vite's job and not Node's —
 // the same stub every other dash rig installs.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -68,6 +70,7 @@ const {
   LIST_CAP,
 } = await import('../dash/src/filterui.ts')
 const { distinctValues, matchKey, BLANK_KEY, buildOrder } = await import('../dash/src/filter.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type DashDoc = import('../dash/src/model.ts').DashDoc
 type Predicate = import('../dash/src/filter.ts').Predicate
 

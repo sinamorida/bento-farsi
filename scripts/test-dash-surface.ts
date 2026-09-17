@@ -47,6 +47,8 @@ import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
+
 
 registerHooks({
   load(url, context, next) {
@@ -70,6 +72,7 @@ const dom = installDom()
 const { parseDoc } = await import('../dash/src/model.ts')
 const { Store } = await import('../dash/src/store.ts')
 const { Grid } = await import('../dash/src/grid.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type DashDoc = import('../dash/src/model.ts').DashDoc
 
 let failures = 0

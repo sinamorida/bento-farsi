@@ -41,10 +41,12 @@
 // break it on purpose.
 
 import { registerHooks } from 'node:module'
+import { pinEnglish } from './lib/pin-en.ts'
 
 // dashboard.ts imports its stylesheet — Vite's job, not Node's. Stub the
 // extension rather than moving the import, which is how every Bento app
 // co-locates a surface with its styles.
+
 registerHooks({
   load(url, context, next) {
     if (url.endsWith('.css')) {
@@ -71,6 +73,7 @@ type TableSheet = import('../dash/src/model.ts').TableSheet
 
 const { Store } = await import('../dash/src/store.ts')
 const { starterDoc } = await import('../dash/src/starter.ts')
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
 type ColumnFilter = import('../dash/src/filter.ts').ColumnFilter
 
 let failures = 0

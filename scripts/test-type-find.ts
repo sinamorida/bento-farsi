@@ -25,6 +25,8 @@
 
 import { matchesInText, findMatches, replaceAll, replaceMatch, nextFrom } from '../type/src/find.ts';
 import { emptyDoc, spliceText, type Block } from '../type/src/model.ts';
+import { pinEnglish } from './lib/pin-en.ts'
+
 
 let checks = 0, failures = 0;
 const ok = (c: boolean, m: string) => { checks++; if (!c) { failures++; console.log(`  FAIL  ${m}`); } else console.log(`  ok    ${m}`); };
@@ -204,6 +206,7 @@ H('replace all is one undo step');
 H('the panel registered itself');
 {
   const { panels, tools, keys } = await import('../type/src/features.ts');
+pinEnglish()  // after the boot imports — registerI18n clears a set locale; see scripts/lib/pin-en.ts
   ok(panels().some(p => p.id === 'find'), 'a Find panel');
   ok(panels().find(p => p.id === 'find')!.label === 'Find', 'whose label is read late, through t()');
   ok(tools('review').some(t => t.id === 'find'), 'a toolbar button in the review group');
