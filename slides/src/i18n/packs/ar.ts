@@ -29,6 +29,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'العربية'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "للعرض التقديمي بأكمله. إظهار عدّاد الشرائح للجمهور أثناء التقديم.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "للعرض التقديمي بأكمله. إظهار شريط التقدم الرفيع في الأسفل أثناء التقديم.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "للعرض التقديمي بأكمله. أسهم التنقل الخاصة بـ Reveal. معطّلة افتراضيًا — الروابط والمفاتيح تتيح التنقل بالفعل.",
+  "Accent": "لون التمييز",
+  "Add this slide to the document's layout picker (New slide button)": "إضافة هذه الشريحة إلى منتقي التخطيطات في المستند (زر شريحة جديدة)",
   "Insert — text, shapes, images, media, tables, charts": "إدراج — نص، أشكال، صور، وسائط، جداول، رسوم بيانية",
   "More actions": "إجراءات أخرى",
   "Slides — show or hide the slide list": "الشرائح — إظهار أو إخفاء قائمة الشرائح",

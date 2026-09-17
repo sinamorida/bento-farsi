@@ -17,6 +17,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Nederlands'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Voor de hele presentatie. Toon de diateller aan het publiek tijdens het presenteren.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Voor de hele presentatie. Toon de dunne voortgangsbalk onderaan tijdens het presenteren.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Voor de hele presentatie. De navigatiepijlen van Reveal. Standaard uit — links en toetsen bieden al navigatie.",
+  "Accent": "Accentkleur",
+  "Add this slide to the document's layout picker (New slide button)": "Voeg deze dia toe aan de indelingskiezer van het document (knop Nieuwe dia)",
   "Insert — text, shapes, images, media, tables, charts": "Invoegen — tekst, vormen, afbeeldingen, media, tabellen, grafieken",
   "More actions": "Meer acties",
   "Slides — show or hide the slide list": "Dia's — dialijst tonen of verbergen",

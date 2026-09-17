@@ -18,6 +18,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Svenska'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "För hela presentationen. Visa bildräknaren för publiken under presentationen.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "För hela presentationen. Visa den tunna förloppsindikatorn längst ned under presentationen.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "För hela presentationen. Reveals egna navigeringspilar. Av som standard — länkar och tangenter kan redan användas för navigering.",
+  "Accent": "Accentfärg",
+  "Add this slide to the document's layout picker (New slide button)": "Lägg till den här bilden i dokumentets layoutväljare (knappen Ny bild)",
   "Insert — text, shapes, images, media, tables, charts": "Infoga — text, former, bilder, media, tabeller, diagram",
   "More actions": "Fler åtgärder",
   "Slides — show or hide the slide list": "Bilder — visa eller dölj bildlistan",

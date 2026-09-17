@@ -467,7 +467,7 @@ export class PropsPanel {
     const saveLy = document.createElement('button')
     saveLy.className = 'ed-btn ed-btn-block'
     saveLy.textContent = t('＋ Save slide as layout…')
-    saveLy.title = "Add this slide to the document's layout picker (New slide button)"
+    saveLy.title = t("Add this slide to the document's layout picker (New slide button)")
     saveLy.addEventListener('click', () => {
       const name = window.prompt('Layout name', this.store.slide.name ?? 'My layout')
       if (!name) return

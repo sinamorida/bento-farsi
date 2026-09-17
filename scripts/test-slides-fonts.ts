@@ -29,7 +29,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { BUILTIN_FONTS, adoptBuiltinFonts, resolveFontSrc } from '../slides/src/fonts.ts'
+import { BUILTIN_FONTS, adoptBuiltinFonts, injectFonts, resolveFontSrc } from '../slides/src/fonts.ts'
 import { FRAUNCES_900, INSTRUMENT_VAR, VAZIRMATN_VAR } from '../slides/src/fontdata.ts'
 import { starterDoc } from '../slides/src/starterdeck.ts'
 import type { BentoDoc } from '../slides/src/model.ts'
@@ -108,6 +108,32 @@ ok(/function prepareForSave[\s\S]*pruneUnusedAssets\(adoptBuiltinFonts\(doc\)\)/
   /kernelSaveFile\(prepareForSave\(doc\), forcePicker\)/.test(save),
   'save.ts: save entry point and serializers share built-in-font adoption and asset pruning')
 ok(/resolveFontSrc\(doc, f\.asset\)/.test(readFileSync(join(root, 'slides/src/fonts.ts'), 'utf8')), 'injectFonts resolves through resolveFontSrc')
+
+console.log('\nfont registration without document fonts\n')
+const previousDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
+const styles = new Map<string, { id: string; textContent: string }>()
+Object.defineProperty(globalThis, 'document', { configurable: true, value: {
+  getElementById: (id: string) => styles.get(id) ?? null,
+  createElement: () => ({ id: '', textContent: '' }),
+  head: { appendChild: (style: { id: string; textContent: string }) => styles.set(style.id, style) },
+} })
+try {
+  injectFonts(deck({}))
+  ok(styles.get('bento-fonts')?.textContent.includes(VAZIRMATN_VAR) === true, 'a document without fonts still registers the embedded Persian UI face')
+  injectFonts(deck({ fonts: [] }))
+  ok(styles.size === 1, 're-registering an empty font list reuses the style element')
+  injectFonts(own)
+  const css = styles.get('bento-fonts')?.textContent ?? ''
+  ok(css.includes(VAZIRMATN_VAR) && css.includes(OTHER), 'document-specific fonts are additive to the shell face')
+} finally {
+  if (previousDocument) Object.defineProperty(globalThis, 'document', previousDocument)
+  else Reflect.deleteProperty(globalThis, 'document')
+}
+const main = readFileSync(join(root, 'slides/src/main.ts'), 'utf8')
+for (const mode of ['audienceMode', 'playerMode', 'editorMode']) {
+  const body = main.split(`function ${mode}(`)[1]?.split('const store')[0]?.split('const card')[0] ?? ''
+  ok(/^\s*injectFonts\(doc\)/m.test(body), `${mode} registers shell fonts without a document-font guard`)
+}
 
 console.log(`\n${checks - failures}/${checks} checks passed`)
 process.exit(failures ? 1 : 0)

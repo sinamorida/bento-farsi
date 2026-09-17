@@ -4,6 +4,9 @@
 import type { Catalog } from '../i18n'
 
 export const zhHans: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "适用于整个演示文稿。演示时向观众显示幻灯片计数器。",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "适用于整个演示文稿。演示时在底部显示细进度条。",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "适用于整个演示文稿。Reveal 自带的导航箭头。默认关闭——链接和按键已可用于导航。",
   "This text box is already bold": "此文本框已是粗体",
   "Italic": "斜体",
   "Underline": "下划线",
@@ -777,6 +780,8 @@ export const zhHans: Catalog = {
   "Keep the file somewhere you can find it again.": "把文件保存在你以后能找到的位置。",
   "Theme": "主题",
   "Deck-wide brand colours. Anything using a theme colour follows when you change it here.": "整份文稿的品牌配色。使用主题颜色的元素会随此处的更改而更新。",
+  "Accent": "强调色",
+  "Add this slide to the document's layout picker (New slide button)": "将此幻灯片添加到文档的版式选择器（“新建幻灯片”按钮）",
   "Accent {n}": "强调色 {n}",
   "Audience copy…": "观众副本…",
   "A hand-out for a live show: opens into the presentation and follows your slides while you are live. Never carries your speaker notes or comments.": "用于直播的分发文件：打开即进入演示，在你直播期间跟随你的幻灯片。绝不包含你的演讲者备注或批注。",

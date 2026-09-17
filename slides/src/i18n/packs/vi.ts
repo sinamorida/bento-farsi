@@ -19,6 +19,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Tiếng Việt'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Cho cả bản trình bày. Hiển thị bộ đếm trang chiếu cho khán giả khi trình chiếu.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Cho cả bản trình bày. Hiển thị thanh tiến trình mảnh ở phía dưới khi trình chiếu.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Cho cả bản trình bày. Các mũi tên điều hướng riêng của Reveal. Mặc định tắt — liên kết và phím đã cho phép điều hướng.",
+  "Accent": "Nhấn",
+  "Add this slide to the document's layout picker (New slide button)": "Thêm trang chiếu này vào bộ chọn bố cục của tài liệu (nút Trang chiếu mới)",
   "Insert — text, shapes, images, media, tables, charts": "Chèn — văn bản, hình khối, hình ảnh, phương tiện, bảng, biểu đồ",
   "More actions": "Thao tác khác",
   "Slides — show or hide the slide list": "Trang chiếu — hiện hoặc ẩn danh sách trang chiếu",

@@ -1080,9 +1080,9 @@ const ph = (
   fontFamily: FONT_STACK,
   fontWeight: 400,
   color: '#1E2A3A',
-  align: 'left',
+  align: 'right',
   valign: 'top',
-  lineHeight: 1.25,
+  lineHeight: 1.35,
   ...type,
 })
 

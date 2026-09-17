@@ -29,6 +29,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Українська'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Для всієї презентації. Показувати глядачам лічильник слайдів під час показу.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Для всієї презентації. Показувати тонку смугу поступу внизу під час показу.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Для всієї презентації. Власні стрілки навігації Reveal. Типово вимкнені — посилання й клавіші вже дають змогу переходити між слайдами.",
+  "Accent": "Акцент",
+  "Add this slide to the document's layout picker (New slide button)": "Додати цей слайд до засобу вибору макетів документа (кнопка «Новий слайд»)",
   "Insert — text, shapes, images, media, tables, charts": "Вставити — текст, фігури, зображення, медіа, таблиці, діаграми",
   "More actions": "Інші дії",
   "Slides — show or hide the slide list": "Слайди — показати або сховати список слайдів",

@@ -38,6 +38,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Filipino'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Para sa buong deck. Ipakita sa audience ang slide counter habang nagpe-present.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Para sa buong deck. Ipakita ang manipis na progress bar sa ibaba habang nagpe-present.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Para sa buong deck. Mga navigation arrow ng Reveal. Naka-off bilang default — puwede nang mag-navigate gamit ang mga link at key.",
+  "Accent": "Kulay na pangdiin",
+  "Add this slide to the document's layout picker (New slide button)": "Idagdag ang slide na ito sa layout picker ng dokumento (button na Bagong slide)",
   "Insert — text, shapes, images, media, tables, charts": "Ipasok — teksto, hugis, larawan, midya, talahanayan, tsart",
   "More actions": "Iba pang aksyon",
   "Slides — show or hide the slide list": "Mga slide — ipakita o itago ang listahan ng slide",
