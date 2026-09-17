@@ -22,6 +22,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'עברית'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "לכל המצגת. הצגת מונה השקופיות לקהל בזמן ההצגה.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "לכל המצגת. הצגת פס ההתקדמות הדק בתחתית בזמן ההצגה.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "לכל המצגת. חיצי הניווט של Reveal. כבויים כברירת מחדל — הקישורים והמקשים כבר מאפשרים ניווט.",
+  "Accent": "צבע הדגשה",
+  "Add this slide to the document's layout picker (New slide button)": "הוספת השקופית הזו לבורר הפריסות של המסמך (כפתור שקופית חדשה)",
   "Insert — text, shapes, images, media, tables, charts": "הוספה — טקסט, צורות, תמונות, מדיה, טבלאות, תרשימים",
   "More actions": "פעולות נוספות",
   "Slides — show or hide the slide list": "שקופיות — הצג או הסתר את רשימת השקופיות",

@@ -21,6 +21,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Dansk'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "For hele præsentationen. Vis diastælleren til publikum under præsentationen.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "For hele præsentationen. Vis den tynde statuslinje langs bunden under præsentationen.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "For hele præsentationen. Reveals egne navigationspile. Slået fra som standard — links og taster kan allerede bruges til navigation.",
+  "Accent": "Accentfarve",
+  "Add this slide to the document's layout picker (New slide button)": "Føj dette dias til dokumentets layoutvælger (knappen Nyt dias)",
   "Insert — text, shapes, images, media, tables, charts": "Indsæt — tekst, former, billeder, medier, tabeller, diagrammer",
   "More actions": "Flere handlinger",
   "Slides — show or hide the slide list": "Slides — vis eller skjul slidelisten",

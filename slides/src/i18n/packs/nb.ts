@@ -23,6 +23,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Norsk bokmål'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "For hele presentasjonen. Vis lysbildetelleren til publikum under presentasjonen.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "For hele presentasjonen. Vis den tynne fremdriftslinjen nederst under presentasjonen.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "For hele presentasjonen. Reveals egne navigasjonspiler. Av som standard — lenker og taster gir allerede navigasjon.",
+  "Accent": "Aksent",
+  "Add this slide to the document's layout picker (New slide button)": "Legg dette lysbildet til i dokumentets oppsettsvelger (knappen Nytt lysbilde)",
   "Insert — text, shapes, images, media, tables, charts": "Sett inn — tekst, former, bilder, medier, tabeller, diagrammer",
   "More actions": "Flere handlinger",
   "Slides — show or hide the slide list": "Lysbilder — vis eller skjul lysbildelisten",

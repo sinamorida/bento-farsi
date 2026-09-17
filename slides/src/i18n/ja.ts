@@ -4,6 +4,9 @@
 import type { Catalog } from '../i18n'
 
 export const ja: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "デッキ全体に適用。プレゼンテーション中にスライドカウンターを観客に表示します。",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "デッキ全体に適用。プレゼンテーション中に下端の細い進行状況バーを表示します。",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "デッキ全体に適用。Reveal のナビゲーション矢印です。リンクとキーで移動できるため、初期設定ではオフです。",
   "This text box is already bold": "このテキストボックスはすでにボールドです",
   "Italic": "斜体",
   "Underline": "下線",
@@ -777,6 +780,8 @@ export const ja: Catalog = {
   "Keep the file somewhere you can find it again.": "ファイルは後で見つけられる場所に保存しておいてください。",
   "Theme": "テーマ",
   "Deck-wide brand colours. Anything using a theme colour follows when you change it here.": "デッキ全体のブランドカラー。テーマカラーを使用している要素は、ここでの変更に追従します。",
+  "Accent": "アクセント",
+  "Add this slide to the document's layout picker (New slide button)": "このスライドをドキュメントのレイアウト選択に追加します（新規スライドボタン）",
   "Accent {n}": "アクセント {n}",
   "Audience copy…": "観客用コピー…",
   "A hand-out for a live show: opens into the presentation and follows your slides while you are live. Never carries your speaker notes or comments.": "ライブ配信用の配布ファイルです。開くとすぐにプレゼンテーションが始まり、配信中はあなたのスライドに追従します。発表者ノートやコメントは決して含まれません。",

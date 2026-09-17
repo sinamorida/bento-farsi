@@ -20,6 +20,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Türkçe'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Sunu genelinde. Sunum sırasında izleyicilere slayt sayacını gösterir.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Sunu genelinde. Sunum sırasında alt kısımdaki ince ilerleme çubuğunu gösterir.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Sunu genelinde. Reveal’ın kendi gezinme okları. Varsayılan olarak kapalıdır — bağlantılar ve tuşlar zaten gezinmeyi sağlar.",
+  "Accent": "Vurgu",
+  "Add this slide to the document's layout picker (New slide button)": "Bu slaydı belgenin düzen seçicisine ekle (Yeni slayt düğmesi)",
   "Insert — text, shapes, images, media, tables, charts": "Ekle — metin, şekiller, görseller, medya, tablolar, grafikler",
   "More actions": "Diğer eylemler",
   "Slides — show or hide the slide list": "Slaytlar — slayt listesini göster veya gizle",

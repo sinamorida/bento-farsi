@@ -26,6 +26,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Suomi'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Koko esitykselle. Näytä dialaskuri yleisölle esityksen aikana.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Koko esitykselle. Näytä ohut edistymispalkki alareunassa esityksen aikana.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Koko esitykselle. Revealin omat navigointinuolet. Oletuksena pois käytöstä — linkeillä ja näppäimillä voi jo navigoida.",
+  "Accent": "Korostusväri",
+  "Add this slide to the document's layout picker (New slide button)": "Lisää tämä dia asiakirjan asetteluvalitsimeen (Uusi dia -painike)",
   "Insert — text, shapes, images, media, tables, charts": "Lisää — teksti, muodot, kuvat, media, taulukot, kaaviot",
   "More actions": "Lisää toimintoja",
   "Slides — show or hide the slide list": "Diat — näytä tai piilota dialuettelo",

@@ -107,7 +107,7 @@ const el = (si: number, id: string) => ex.slides[si].elements.find((e) => e.id =
 const t1 = el(0, 't1') as unknown as TextElement
 const want = defaultText({ id: 't1', x: 96, y: 80, w: 1000, h: 80, html: 'Hello', fontSize: 48, color: readableInk(ex.slides[0].background) })
 ok(canon(t1) === canon(want), 'a light-slide text box equals defaultText(...) with readableInk of the slide background — the editor\'s own insert')
-ok(t1.fontFamily === FONT_STACK && t1.fontWeight === 400 && t1.align === 'center' && t1.valign === 'middle' && t1.lineHeight === 1.25 && t1.rotation === 0 && t1.opacity === 1, 'rotation, opacity, font stack, weight, align, valign, line height filled')
+ok(t1.fontFamily === FONT_STACK && t1.fontWeight === 400 && t1.align === want.align && t1.valign === want.valign && t1.lineHeight === want.lineHeight && t1.rotation === 0 && t1.opacity === 1, 'rotation, opacity, font stack, weight, align, valign, line height filled')
 const s1 = el(0, 's1') as unknown as ShapeElement
 ok(canon(s1) === canon(defaultShape('ellipse', { id: 's1', x: 100, y: 200, w: 200, h: 200 })), 'an ellipse equals defaultShape(\'ellipse\', …) — radius 0, not the rect\'s 12')
 const t2 = el(1, 't2') as unknown as TextElement

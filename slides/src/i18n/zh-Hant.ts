@@ -4,6 +4,9 @@
 import type { Catalog } from '../i18n'
 
 export const zhHant: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "套用至整份簡報。簡報播放時向觀眾顯示投影片計數器。",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "套用至整份簡報。簡報播放時在底部顯示細進度列。",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "套用至整份簡報。Reveal 內建的導覽箭頭。預設關閉——連結和按鍵已可用於導覽。",
   "This text box is already bold": "此文字方塊已是粗體",
   "Italic": "斜體",
   "Underline": "底線",
@@ -777,6 +780,8 @@ export const zhHant: Catalog = {
   "Keep the file somewhere you can find it again.": "請將檔案保存在你日後找得到的位置。",
   "Theme": "主題",
   "Deck-wide brand colours. Anything using a theme colour follows when you change it here.": "整份簡報的品牌配色。使用主題顏色的元素會隨此處的變更而更新。",
+  "Accent": "強調色",
+  "Add this slide to the document's layout picker (New slide button)": "將此投影片加入文件的版面配置選擇器（「新增投影片」按鈕）",
   "Accent {n}": "強調色 {n}",
   "Audience copy…": "觀眾副本…",
   "A hand-out for a live show: opens into the presentation and follows your slides while you are live. Never carries your speaker notes or comments.": "用於直播的分發檔案：開啟即進入簡報，在你直播期間跟隨你的投影片。絕不包含你的講者備註或註解。",

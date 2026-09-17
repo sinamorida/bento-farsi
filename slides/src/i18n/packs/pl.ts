@@ -20,6 +20,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Polski'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Dla całej prezentacji. Pokazuj publiczności licznik slajdów podczas prezentacji.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Dla całej prezentacji. Pokazuj cienki pasek postępu u dołu podczas prezentacji.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Dla całej prezentacji. Własne strzałki nawigacyjne Reveal. Domyślnie wyłączone — łącza i klawisze już umożliwiają nawigację.",
+  "Accent": "Akcent",
+  "Add this slide to the document's layout picker (New slide button)": "Dodaj ten slajd do wyboru układu dokumentu (przycisk Nowy slajd)",
   "Insert — text, shapes, images, media, tables, charts": "Wstaw — tekst, kształty, obrazy, multimedia, tabele, wykresy",
   "More actions": "Więcej działań",
   "Slides — show or hide the slide list": "Slajdy — pokaż lub ukryj listę slajdów",

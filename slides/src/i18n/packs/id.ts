@@ -19,6 +19,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Bahasa Indonesia'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Untuk seluruh presentasi. Tampilkan penghitung slide kepada audiens saat presentasi.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Untuk seluruh presentasi. Tampilkan bilah progres tipis di bagian bawah saat presentasi.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Untuk seluruh presentasi. Panah navigasi bawaan Reveal. Nonaktif secara default — tautan dan tombol sudah dapat digunakan untuk navigasi.",
+  "Accent": "Aksen",
+  "Add this slide to the document's layout picker (New slide button)": "Tambahkan slide ini ke pemilih tata letak dokumen (tombol Slide baru)",
   "Insert — text, shapes, images, media, tables, charts": "Sisipkan — teks, bentuk, gambar, media, tabel, bagan",
   "More actions": "Tindakan lainnya",
   "Slides — show or hide the slide list": "Slide — tampilkan atau sembunyikan daftar slide",

@@ -45,6 +45,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'Türkmen'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Bütin prezentasiýa üçin. Görkeziliş wagtynda tomaşaçylara slaýd hasaplaýjysyny görkez.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Bütin prezentasiýa üçin. Görkeziliş wagtynda aşakda inçe öňegidişlik zolagyny görkez.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Bütin prezentasiýa üçin. Reveal-iň öz nawigasiýa oklary. Başlangyç ýagdaýda öçürilen — baglanyşyklar we düwmeler eýýäm geçmäge mümkinçilik berýär.",
+  "Accent": "Aksent",
+  "Add this slide to the document's layout picker (New slide button)": "Bu slaýdy resminamanyň ýerleşiş saýlaýjysyna goş (Täze slaýd düwmesi)",
   "Insert — text, shapes, images, media, tables, charts": "Goş — tekst, şekiller, suratlar, media, tablisalar, diagrammalar",
   "More actions": "Başga amallar",
   "Slides — show or hide the slide list": "Slaýdlar — slaýd sanawyny görkez ýa-da gizle",

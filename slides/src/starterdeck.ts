@@ -71,8 +71,11 @@ const S_CHOREO_3 = 'sd-s-choreo-3'
 
 // --- builders ---------------------------------------------------------------
 
+// Authored starter content only — never infer alignment from the viewer locale.
+const isPersian = (s: string) => /\p{Script=Arabic}/u.test(s)
+
 const text = (p: Partial<TextElement>): TextElement =>
-  ({ ...defaultText({ align: 'left', valign: 'top', fontFamily: BODY }), ...p }) as TextElement
+  ({ ...defaultText({ align: isPersian(p.html ?? '') ? 'right' : 'left', valign: 'top', fontFamily: BODY }), ...p }) as TextElement
 
 const shape = (kind: Parameters<typeof defaultShape>[0], p: Partial<ShapeElement>): ShapeElement =>
   ({ ...defaultShape(kind), stroke: 'transparent', strokeWidth: 0, ...p }) as ShapeElement
@@ -80,7 +83,8 @@ const shape = (kind: Parameters<typeof defaultShape>[0], p: Partial<ShapeElement
 const kicker = (label: string, p: Partial<TextElement> = {}): TextElement =>
   text({
     id: KICKER, x: 96, y: 54, w: 700, h: 26, html: label,
-    fontSize: 13, fontWeight: 700, color: PEACH, letterSpacing: 4, ...p,
+    fontSize: 13, fontWeight: 700, color: PEACH,
+    letterSpacing: isPersian(label) ? 0 : 4, ...p,
   })
 
 const title = (html: string, p: Partial<TextElement> = {}): TextElement =>
@@ -622,12 +626,12 @@ export function starterDoc(): BentoDoc {
         text({
           x: 96, y: 186, w: 480, h: 24, html: 'ریاضیات — نوشتن مستقیم <b>\\$\u2026\\$</b> درون جعبه متن',
           fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: 'rgba(185,196,212,0.62)',
-          align: 'left', valign: 'middle',
+          valign: 'middle',
         }),
         text({
           x: 640, y: 186, w: 544, h: 24, html: 'کد برنامه — <b>۷۷ زبان</b> به‌صورت توکار',
           fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: 'rgba(185,196,212,0.62)',
-          align: 'left', valign: 'middle',
+          valign: 'middle',
         }),
         // LEFT: the derivation. Display mode so fractions and the radical set
         // at full size; a, b and c travel between the three beats.
@@ -683,12 +687,12 @@ export function starterDoc(): BentoDoc {
         text({
           x: 96, y: 186, w: 480, h: 24, html: 'ریاضیات — نوشتن مستقیم <b>\\$\u2026\\$</b> درون جعبه متن',
           fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: 'rgba(185,196,212,0.62)',
-          align: 'left', valign: 'middle',
+          valign: 'middle',
         }),
         text({
           x: 640, y: 186, w: 544, h: 24, html: 'کد برنامه — <b>۷۷ زبان</b> به‌صورت توکار',
           fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: 'rgba(185,196,212,0.62)',
-          align: 'left', valign: 'middle',
+          valign: 'middle',
         }),
         // LEFT: the derivation. Display mode so fractions and the radical set
         // at full size; a, b and c travel between the three beats.
@@ -744,12 +748,12 @@ export function starterDoc(): BentoDoc {
         text({
           x: 96, y: 186, w: 480, h: 24, html: 'ریاضیات — نوشتن مستقیم <b>\\$\u2026\\$</b> درون جعبه متن',
           fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: 'rgba(185,196,212,0.62)',
-          align: 'left', valign: 'middle',
+          valign: 'middle',
         }),
         text({
           x: 640, y: 186, w: 544, h: 24, html: 'کد برنامه — <b>۷۷ زبان</b> به‌صورت توکار',
           fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: 'rgba(185,196,212,0.62)',
-          align: 'left', valign: 'middle',
+          valign: 'middle',
         }),
         // LEFT: the derivation. Display mode so fractions and the radical set
         // at full size; a, b and c travel between the three beats.

@@ -13,6 +13,11 @@ import type { Catalog } from '../../i18n'
 export const label = '한국어'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "프레젠테이션 전체에 적용됩니다. 발표 중 청중에게 슬라이드 카운터를 표시합니다.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "프레젠테이션 전체에 적용됩니다. 발표 중 하단에 얇은 진행률 표시줄을 표시합니다.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "프레젠테이션 전체에 적용됩니다. Reveal 자체 탐색 화살표입니다. 링크와 키로 이미 탐색할 수 있으므로 기본적으로 꺼져 있습니다.",
+  "Accent": "강조색",
+  "Add this slide to the document's layout picker (New slide button)": "이 슬라이드를 문서의 레이아웃 선택기에 추가합니다(새 슬라이드 버튼)",
   "Insert — text, shapes, images, media, tables, charts": "삽입 — 텍스트, 도형, 이미지, 미디어, 표, 차트",
   "More actions": "추가 작업",
   "Slides — show or hide the slide list": "슬라이드 — 슬라이드 목록 표시 또는 숨기기",

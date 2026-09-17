@@ -4,6 +4,9 @@
 import type { Catalog } from '../i18n'
 
 export const es: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Para toda la presentación. Muestra el contador de diapositivas al público durante la presentación.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Para toda la presentación. Muestra la barra fina de progreso en la parte inferior durante la presentación.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Para toda la presentación. Flechas de navegación propias de Reveal. Desactivadas por defecto: los enlaces y las teclas ya permiten navegar.",
   "This text box is already bold": "Este cuadro de texto ya está en negrita",
   "Italic": "Cursiva",
   "Underline": "Subrayado",
@@ -777,6 +780,8 @@ export const es: Catalog = {
   "Keep the file somewhere you can find it again.": "Guarda el archivo en un lugar donde puedas encontrarlo.",
   "Theme": "Tema",
   "Deck-wide brand colours. Anything using a theme colour follows when you change it here.": "Colores de marca de toda la presentación. Todo lo que use un color del tema se actualiza al cambiarlo aquí.",
+  "Accent": "Acento",
+  "Add this slide to the document's layout picker (New slide button)": "Añade esta diapositiva al selector de diseños del documento (botón Nueva diapositiva)",
   "Accent {n}": "Acento {n}",
   "Audience copy…": "Copia para el público…",
   "A hand-out for a live show: opens into the presentation and follows your slides while you are live. Never carries your speaker notes or comments.": "Un material para una sesión en directo: se abre en la presentación y sigue tus diapositivas mientras estás en directo. Nunca incluye tus notas del orador ni comentarios.",

@@ -24,6 +24,9 @@ import type { Catalog } from '../i18n'
 
 
 export const fa: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "برای کل ارائه. شمارندهٔ اسلاید را هنگام ارائه به مخاطبان نشان می‌دهد.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "برای کل ارائه. نوار باریک پیشرفت را هنگام ارائه در پایین صفحه نشان می‌دهد.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "برای کل ارائه. پیکان‌های ناوبری خود Reveal. به‌طور پیش‌فرض خاموش است — پیوندها و کلیدها از قبل امکان جابه‌جایی را فراهم می‌کنند.",
   "Insert — text, shapes, images, media, tables, charts": "درج — متن، شکل، تصویر، رسانه، جدول، نمودار",
   "More actions": "اقدامات بیشتر",
   "Slides — show or hide the slide list": "اسلایدها — نمایش یا پنهان کردن فهرست اسلایدها",
@@ -852,6 +855,8 @@ export const fa: Catalog = {
   "Keep the file somewhere you can find it again.": "پرونده را جایی نگه دارید که دوباره پیدایش کنید.",
   "Theme": "پوسته",
   "Deck-wide brand colours. Anything using a theme colour follows when you change it here.": "رنگ‌های برند در کل دک. هر چیزی که رنگ پوسته را به کار می‌برد، با تغییر آن در اینجا تغییر می‌کند.",
+  "Accent": "تأکید",
+  "Add this slide to the document's layout picker (New slide button)": "این اسلاید به انتخابگر طرح‌بندی سند افزوده می‌شود (دکمهٔ اسلاید جدید)",
   "Accent {n}": "تأکید {n}",
   "Audience copy…": "نسخهٔ مخاطبان…",
   "A hand-out for a live show: opens into the presentation and follows your slides while you are live. Never carries your speaker notes or comments.": "برگهٔ توزیعی برای نمایش زنده: مستقیم در ارائه باز می‌شود و تا زمانی که زنده هستید اسلایدهایتان را دنبال می‌کند. هرگز یادداشت‌های سخنران یا نظرهایتان را همراه ندارد.",

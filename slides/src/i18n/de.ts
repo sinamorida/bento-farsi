@@ -4,6 +4,9 @@
 import type { Catalog } from '../i18n'
 
 export const de: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "Für die gesamte Präsentation. Zeigt dem Publikum während der Präsentation den Folienzähler.",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "Für die gesamte Präsentation. Zeigt während der Präsentation den schmalen Fortschrittsbalken am unteren Rand.",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "Für die gesamte Präsentation. Reveals eigene Navigationspfeile. Standardmäßig aus — Links und Tasten ermöglichen bereits die Navigation.",
   "This text box is already bold": "Dieses Textfeld ist bereits fett",
   "Italic": "Kursiv",
   "Underline": "Unterstrichen",
@@ -777,6 +780,8 @@ export const de: Catalog = {
   "Keep the file somewhere you can find it again.": "Bewahren Sie die Datei an einem Ort auf, den Sie wiederfinden.",
   "Theme": "Design",
   "Deck-wide brand colours. Anything using a theme colour follows when you change it here.": "Markenfarben für das gesamte Deck. Alles, was eine Designfarbe verwendet, folgt Ihren Änderungen hier.",
+  "Accent": "Akzent",
+  "Add this slide to the document's layout picker (New slide button)": "Fügt diese Folie zur Layout-Auswahl des Dokuments hinzu (Schaltfläche „Neue Folie“)",
   "Accent {n}": "Akzent {n}",
   "Audience copy…": "Publikumskopie…",
   "A hand-out for a live show: opens into the presentation and follows your slides while you are live. Never carries your speaker notes or comments.": "Ein Handout für eine Live-Vorführung: öffnet direkt die Präsentation und folgt Ihren Folien, solange Sie live sind. Enthält nie Ihre Sprechernotizen oder Kommentare.",

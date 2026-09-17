@@ -23,6 +23,11 @@ import type { Catalog } from '../../i18n'
 export const label = 'ไทย'
 
 export const strings: Catalog = {
+  "Deck-wide. Show the slide counter to the audience while presenting.": "ใช้กับทั้งงานนำเสนอ แสดงตัวนับสไลด์ให้ผู้ชมเห็นขณะนำเสนอ",
+  "Deck-wide. Show the thin progress bar along the bottom while presenting.": "ใช้กับทั้งงานนำเสนอ แสดงแถบความคืบหน้าบางๆ ที่ด้านล่างขณะนำเสนอ",
+  "Deck-wide. Reveal’s own navigation arrows. Off by default — links and keys already navigate.": "ใช้กับทั้งงานนำเสนอ ลูกศรนำทางของ Reveal ปิดไว้ตามค่าเริ่มต้น — ลิงก์และปุ่มบนแป้นพิมพ์ใช้เพื่อนำทางได้อยู่แล้ว",
+  "Accent": "สีเน้น",
+  "Add this slide to the document's layout picker (New slide button)": "เพิ่มสไลด์นี้ไปยังตัวเลือกเลย์เอาต์ของเอกสาร (ปุ่มสไลด์ใหม่)",
   "Insert — text, shapes, images, media, tables, charts": "แทรก — ข้อความ รูปทรง รูปภาพ สื่อ ตาราง แผนภูมิ",
   "More actions": "การกระทำเพิ่มเติม",
   "Slides — show or hide the slide list": "สไลด์ — แสดงหรือซ่อนรายการสไลด์",

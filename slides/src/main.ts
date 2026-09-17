@@ -155,7 +155,7 @@ function bootWith(doc: BentoDoc, docIsFresh = false) {
  */
 function audienceMode(doc: BentoDoc) {
   document.title = `${doc.title} — ${appConfig().appName}`
-  if (doc.fonts?.length) injectFonts(doc)
+  injectFonts(doc)
   document.getElementById('bento-splash')?.remove()
 
   const store = new Store(doc)
@@ -214,7 +214,7 @@ function audienceMode(doc: BentoDoc) {
  */
 function playerMode(doc: BentoDoc) {
   document.title = `${doc.title} — ${appConfig().appName}`
-  if (doc.fonts?.length) injectFonts(doc)
+  injectFonts(doc)
   document.getElementById('bento-splash')?.remove()
   const card = document.createElement('div')
   card.className = 'ed-player'
@@ -242,9 +242,8 @@ function editorMode(doc: BentoDoc, docIsFresh = false) {
 
 document.title = `${doc.title} — ${appConfig().appName}`
 
-// Embedded fonts: register @font-face rules from the asset table so text
-// elements can use bundled families in the editor, presenter and thumbnails.
-if (doc.fonts?.length) injectFonts(doc)
+// The shell's UI font is needed even when the document has no embedded fonts.
+injectFonts(doc)
 
 const store = new Store(doc)
 const editor = new Editor(document.getElementById('app')!, store)
