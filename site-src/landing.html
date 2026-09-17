@@ -36,6 +36,12 @@
   font-display: swap;
   src: url(__INSTRUMENT__) format('woff2');
 }
+@font-face {
+  font-family: 'Vazirmatn';
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(__VAZIRMATN__) format('woff2');
+}
 
 /* ————— Midnight & peach — the showcase deck's palette, verbatim ————— */
 :root {
@@ -476,6 +482,69 @@ section:not(.paper) .card p { color: var(--mist); }
 .gp-picnic .polp { left: 49.5%; top: 53%; width: 16%; height: 30%; border-radius: 3px; background: url(__PH_FAIR__) center/cover; transform: rotate(-5deg); }
 .gp-picnic .cap { left: 48%; top: 84.5%; width: 19%; text-align: center; font-size: 8px; font-weight: 800; color: #201A31; transform: rotate(-5deg); }
 
+/* ————— the Farsi template family (RTL, Vazirmatn) ————— */
+.gposter .fa { direction: rtl; font-family: 'Vazirmatn', Tahoma, 'Segoe UI', sans-serif; }
+/* helal — navy ground, brass hairline + squares, big bone season title */
+.gp-helal { background: #0F1D30; }
+.gp-helal .k { right: 7.5%; top: 11.5%; font-size: 8.5px; font-weight: 600; color: #E0C583; }
+.gp-helal .hr { right: 7.5%; left: 7.5%; top: 16.5%; height: 1.5px; background: rgba(201, 162, 75, 0.45); }
+.gp-helal .t { right: 7.5%; top: 26%; font-size: 42px; font-weight: 800; color: #F4F1E9; }
+.gp-helal .sq { top: 70%; width: 3.4%; aspect-ratio: 1; background: linear-gradient(160deg, #D9B364, #B08A3E); }
+.gp-helal .q1 { right: 7.5%; } .gp-helal .q2 { right: 12.2%; } .gp-helal .q3 { right: 16.9%; } .gp-helal .q4 { right: 21.6%; }
+.gp-helal .sub { right: 27%; top: 70.4%; font-size: 8.5px; color: #8195AD; }
+/* shetab — void with two mesh blobs, huge lilac pitch line, hot pill */
+.gp-shetab { background: #0B0716; }
+.gp-shetab .b1 { left: -12%; top: -24%; width: 46%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 38% 38%, rgba(109, 91, 255, 0.75), rgba(109, 91, 255, 0) 70%); }
+.gp-shetab .b2 { right: -10%; bottom: -26%; width: 42%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(255, 79, 163, 0.65), rgba(255, 79, 163, 0) 70%); }
+.gp-shetab .k { right: 7.5%; top: 12%; font-size: 8.5px; font-weight: 700; color: #8B7BFF; }
+.gp-shetab .t { right: 7.5%; top: 22%; font-size: 36px; line-height: 1.25; font-weight: 800; color: #EDE9FF; }
+.gp-shetab .pill { right: 7.5%; top: 71%; width: 17%; height: 11%; border-radius: 999px; background: linear-gradient(140deg, #FF4FA3, #FF8A5C); box-shadow: 0 0 18px rgba(255, 79, 163, 0.5); }
+.gp-shetab .pt { right: 7.5%; top: 73.6%; width: 17%; text-align: center; font-size: 9.5px; font-weight: 700; color: #fff; }
+/* atelier — cream paper, tape strips, terra accents */
+.gp-atelier { background: #F7F3E8; }
+.gp-atelier .tp1 { right: 10%; top: 6%; width: 11%; height: 5.5%; background: rgba(232, 184, 75, 0.85); transform: rotate(3deg); }
+.gp-atelier .tp2 { left: 12%; top: 8%; width: 11%; height: 5.5%; background: rgba(74, 123, 166, 0.7); transform: rotate(-4deg); }
+.gp-atelier .k { right: 7.5%; top: 15%; font-size: 8.5px; font-weight: 700; color: #C96F4A; }
+.gp-atelier .t { right: 7.5%; top: 24%; font-size: 34px; line-height: 1.3; font-weight: 800; color: #26251C; }
+.gp-atelier .dot { right: 7.5%; top: 70%; width: 3.6%; aspect-ratio: 1; background: #C96F4A; }
+.gp-atelier .sub { right: 12.2%; top: 70.8%; font-size: 9px; color: rgba(38, 37, 28, 0.6); }
+/* namayesh — charcoal, giant bone wordmark, persimmon bar, three clay dots */
+.gp-namayesh { background: #191817; }
+.gp-namayesh .t { right: 7.5%; top: 18%; font-size: 62px; font-weight: 800; color: #EFECE4; }
+.gp-namayesh .bar { right: 7.5%; top: 56%; width: 20%; height: 2.6%; background: linear-gradient(0deg, #C75B31, #E67E4E); }
+.gp-namayesh .sub { right: 7.5%; top: 63%; font-size: 9.5px; font-weight: 600; color: rgba(239, 236, 228, 0.6); }
+.gp-namayesh .d1, .gp-namayesh .d2, .gp-namayesh .d3 { top: 76%; width: 2.8%; aspect-ratio: 1; border-radius: 3px; }
+.gp-namayesh .d1 { right: 7.5%; background: #B4744C; } .gp-namayesh .d2 { right: 11%; background: #3A3733; } .gp-namayesh .d3 { right: 14.5%; background: #D96C3F; }
+/* jaraghe — void, glowing device mock, neon wordmark */
+.gp-jaraghe { background: #070A08; }
+.gp-jaraghe .dev { left: 8%; top: 14%; width: 24%; height: 72%; border-radius: 10px; background: #0E1611; border: 1.5px solid rgba(184, 255, 60, 0.4); box-shadow: 0 0 26px rgba(184, 255, 60, 0.25); }
+.gp-jaraghe .scr { left: 10.2%; top: 19.5%; width: 19.6%; height: 55%; border-radius: 6px; background: linear-gradient(160deg, rgba(184, 255, 60, 0.22), rgba(55, 240, 194, 0.06)); }
+.gp-jaraghe .k { right: 7.5%; top: 13%; font-size: 8.5px; font-weight: 700; color: #B8FF3C; }
+.gp-jaraghe .t { right: 7.5%; top: 24%; font-size: 56px; font-weight: 800; color: #F2FFE8; text-shadow: 0 0 22px rgba(184, 255, 60, 0.35); }
+.gp-jaraghe .sub { right: 7.5%; top: 56%; font-size: 10px; color: rgba(178, 210, 190, 0.62); }
+/* hamayesh — grape poster, sun date, lilac title, three sticker shapes */
+.gp-hamayesh { background: #31215A; }
+.gp-hamayesh .date { right: 7.5%; top: 12%; font-size: 26px; font-weight: 800; color: #FFC93C; }
+.gp-hamayesh .t { right: 7.5%; top: 28%; font-size: 25px; line-height: 1.35; font-weight: 800; color: #EDE8F9; }
+.gp-hamayesh .tri { left: 9%; top: 14%; width: 17%; height: 24%; background: #FFC93C; clip-path: polygon(50% 0, 100% 100%, 0 100%); transform: rotate(6deg); }
+.gp-hamayesh .ci { left: 24%; top: 46%; width: 12%; aspect-ratio: 1; border-radius: 50%; background: #FF6B4A; }
+.gp-hamayesh .rr { left: 10%; top: 66%; width: 13%; height: 22%; border-radius: 22%; background: #EDE8F9; transform: rotate(-8deg); }
+.gp-hamayesh .sub { right: 7.5%; top: 68%; font-size: 9px; color: rgba(237, 232, 249, 0.65); }
+/* nabz — fog ground, ink headline, four brand dots */
+.gp-nabz { background: #EDF0F5; }
+.gp-nabz .k { right: 7.5%; top: 12.5%; font-size: 8.5px; font-weight: 700; color: #2E6BE6; }
+.gp-nabz .t { right: 7.5%; top: 22%; font-size: 36px; font-weight: 800; color: #1B2430; }
+.gp-nabz .dot { top: 62%; width: 3.4%; aspect-ratio: 1; border-radius: 50%; }
+.gp-nabz .c1 { right: 7.5%; background: #2E6BE6; } .gp-nabz .c2 { right: 12.2%; background: #12A594; }
+.gp-nabz .c3 { right: 16.9%; background: #EFA022; } .gp-nabz .c4 { right: 21.6%; background: #E5484D; }
+.gp-nabz .sub { right: 27%; top: 62.6%; font-size: 8.5px; color: rgba(27, 36, 48, 0.58); }
+/* safid — broken white, huge ink word, one cobalt square */
+.gp-safid { background: #F4F3EF; }
+.gp-safid .k { right: 7.5%; top: 12%; font-size: 8.5px; font-weight: 600; color: rgba(20, 20, 20, 0.55); }
+.gp-safid .t { right: 7.5%; top: 26%; font-size: 64px; font-weight: 800; color: #141414; }
+.gp-safid .cb { right: 7.5%; top: 66%; width: 4.4%; height: 6.5%; background: #2244EE; }
+.gp-safid .sub { right: 13%; top: 67%; font-size: 9px; color: rgba(20, 20, 20, 0.55); }
+
 /* code vignette — the honest document */
 .codebox {
   border-radius: 16px;
@@ -632,7 +701,7 @@ body.kdeck header, body.kdeck footer { display: none; }
     <div class="kicker rv">The gallery</div>
     <hr class="hairline rv" style="max-width:220px">
     <h2 class="rv">Start from something beautiful.</h2>
-    <p class="lede rv d1">Four templates, four art directions, and each one is a <b>complete working file</b>. Open one: it boots straight into the app. Save it and it becomes your own deck, fresh identity and all. Every deck below was <b>designed and written by an AI agent</b> editing the document directly.</p>
+    <p class="lede rv d1">Twelve templates — four English art directions and a full <b>Farsi family of eight</b> — and each one is a <b>complete working file</b>. Open one: it boots straight into the app. Save it and it becomes your own deck, fresh identity and all. Every deck below was <b>designed and written by an AI agent</b> editing the document directly.</p>
     <div class="gal">
       <div class="gcard rv">
         <a class="gposter gp-signal" href="/gallery/signal-editorial-type.bento.html" target="_blank" rel="noopener" aria-label="Open the Signal template in a new tab">
@@ -703,6 +772,127 @@ body.kdeck header, body.kdeck footer { display: none; }
           <div class="gacts">
             <a class="gbtn" href="/gallery/picnic-playful.bento.html" target="_blank" rel="noopener">Open ↗</a>
             <a class="gbtn" href="/gallery/picnic-playful.bento.html" download="Pixel_Picnic.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv">
+        <a class="gposter gp-helal" href="/gallery/helal-executive-report.bento.html" target="_blank" rel="noopener" aria-label="Open the Helal template in a new tab">
+          <span class="fa k">هلدینگ هلال — گزارش فصلی هیئت‌مدیره</span>
+          <span class="hr"></span>
+          <span class="fa t">تابستان ۱۴۰۵</span>
+          <span class="sq q1"></span><span class="sq q2"></span><span class="sq q3"></span><span class="sq q4"></span>
+          <span class="fa sub">چهار شاخص، یک روایت</span>
+        </a>
+        <div class="gmeta">
+          <div><h3>هلال</h3><p>گزارش مدیریتی فصلی — سرمه‌ای و برنجی؛ کارت‌های شاخص با morph جابه‌جا می‌شوند.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/helal-executive-report.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/helal-executive-report.bento.html" download="Helal.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv d1">
+        <a class="gposter gp-shetab" href="/gallery/shetab-startup-pitch.bento.html" target="_blank" rel="noopener" aria-label="Open the Shetab template in a new tab">
+          <span class="b1"></span><span class="b2"></span>
+          <span class="fa k">شتاب — پلتفرم تحلیل رشد</span>
+          <span class="fa t">رشد را<br>دقیق ببینید.</span>
+          <span class="pill"></span><span class="fa pt">شروع کنید</span>
+        </a>
+        <div class="gmeta">
+          <div><h3>شتاب</h3><p>پیچ استارتاپ — توده‌های گرادیان، از مسئله تا درخواست سرمایه.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/shetab-startup-pitch.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/shetab-startup-pitch.bento.html" download="Shetab.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv d1">
+        <a class="gposter gp-atelier" href="/gallery/atelier-lecture.bento.html" target="_blank" rel="noopener" aria-label="Open the Atelier template in a new tab">
+          <span class="tp1"></span><span class="tp2"></span>
+          <span class="fa k">کارگاه آتلیه · جلسهٔ سوم</span>
+          <span class="fa t">ترکیب‌بندی را<br>دیدنی کنید.</span>
+          <span class="dot"></span><span class="fa sub">پنجشنبه‌ها، ۱۶ تا ۱۸</span>
+        </a>
+        <div class="gmeta">
+          <div><h3>آتلیه</h3><p>درس و کارگاه — تخته‌سیاه و شبکهٔ یک‌سومی که با morph جابه‌جا می‌شود.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/atelier-lecture.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/atelier-lecture.bento.html" download="Atelier.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv d2">
+        <a class="gposter gp-namayesh" href="/gallery/namayesh-portfolio.bento.html" target="_blank" rel="noopener" aria-label="Open the Namayesh template in a new tab">
+          <span class="fa t">نمایش</span>
+          <span class="bar"></span>
+          <span class="fa sub">استودیو طراحی — اشیاء، چاپ، فضا</span>
+          <span class="d1"></span><span class="d2"></span><span class="d3"></span>
+        </a>
+        <div class="gmeta">
+          <div><h3>نمایش</h3><p>نمونه‌کار استودیو — سه فصل عکس‌دار با بلوک‌های رنگی مورف‌شونده.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/namayesh-portfolio.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/namayesh-portfolio.bento.html" download="Namayesh.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv">
+        <a class="gposter gp-jaraghe" href="/gallery/jaraghe-launch.bento.html" target="_blank" rel="noopener" aria-label="Open the Jaraghe template in a new tab">
+          <span class="dev"></span><span class="scr"></span>
+          <span class="fa k">رویداد معرفی محصول</span>
+          <span class="fa t">جرقه</span>
+          <span class="fa sub">یادداشت‌هایی که خودشان فکر می‌کنند.</span>
+        </a>
+        <div class="gmeta">
+          <div><h3>جرقه</h3><p>لانچ محصول — دستگاهِ شکل‌کشیده و یک اسلاید state تعاملی.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/jaraghe-launch.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/jaraghe-launch.bento.html" download="Jaraghe.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv d1">
+        <a class="gposter gp-hamayesh" href="/gallery/hamayesh-event.bento.html" target="_blank" rel="noopener" aria-label="Open the Hamayesh template in a new tab">
+          <span class="tri"></span><span class="ci"></span><span class="rr"></span>
+          <span class="fa date">۱۲–۱۴ آبان</span>
+          <span class="fa t">همایش<br>طراحی تهران</span>
+          <span class="fa sub">مرکز همایش‌های یادمان · ثبت‌نام از اول مهر</span>
+        </a>
+        <div class="gmeta">
+          <div><h3>همایش</h3><p>رویداد و کنفرانس — پوستر انگوری با نوار آجندای مورف‌شونده.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/hamayesh-event.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/hamayesh-event.bento.html" download="Hamayesh.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv d1">
+        <a class="gposter gp-nabz" href="/gallery/nabz-data-report.bento.html" target="_blank" rel="noopener" aria-label="Open the Nabz template in a new tab">
+          <span class="fa k">نبض — پایش محصول دیجیتال</span>
+          <span class="fa t">تابستان در یک نگاه</span>
+          <span class="dot c1"></span><span class="dot c2"></span><span class="dot c3"></span><span class="dot c4"></span>
+          <span class="fa sub">چهار سنجه، یک فصل</span>
+        </a>
+        <div class="gmeta">
+          <div><h3>نبض</h3><p>گزارش داده — از کارت‌های KPI تا قیف تبدیل، همه با morph.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/nabz-data-report.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/nabz-data-report.bento.html" download="Nabz.bento.html">⤓ Get</a>
+          </div>
+        </div>
+      </div>
+      <div class="gcard rv d2">
+        <a class="gposter gp-safid" href="/gallery/safid-minimal.bento.html" target="_blank" rel="noopener" aria-label="Open the Safid template in a new tab">
+          <span class="fa k">استودیو سفید — مانیفست طراحی ۱۴۰۵</span>
+          <span class="fa t">سفید</span>
+          <span class="cb"></span>
+          <span class="fa sub">فضای خالی، بخشی از جمله است.</span>
+        </a>
+        <div class="gmeta">
+          <div><h3>سفید</h3><p>مینیمال سوئیسی — یک اکسنت کبالت و سه بیت morph دقیق.</p></div>
+          <div class="gacts">
+            <a class="gbtn" href="/gallery/safid-minimal.bento.html" target="_blank" rel="noopener">Open ↗</a>
+            <a class="gbtn" href="/gallery/safid-minimal.bento.html" download="Safid.bento.html">⤓ Get</a>
           </div>
         </div>
       </div>

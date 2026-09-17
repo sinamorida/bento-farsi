@@ -17,7 +17,9 @@ const out = process.argv[2] ?? join(root, 'site/index.html')
 
 const fontSrc = readFileSync(join(root, 'slides/src/fontdata.ts'), 'utf8')
 const grab = (name) => {
-  const m = fontSrc.match(new RegExp(`export const ${name}\\s*=\\s*'(data:[^']+)'`))
+  // FRAUNCES/INSTRUMENT are single-quoted in fontdata.ts, VAZIRMATN is
+  // double-quoted — accept both, the data URI itself never contains a quote.
+  const m = fontSrc.match(new RegExp(`export const ${name}\\s*=\\s*['"](data:[^'"]+)['"]`))
   if (!m) throw new Error(`${name} not found in fontdata.ts`)
   return m[1]
 }
@@ -25,6 +27,8 @@ const grab = (name) => {
 let html = readFileSync(join(root, 'site-src/landing.html'), 'utf8')
 html = html.replace('__FRAUNCES__', grab('FRAUNCES_900'))
 html = html.replace('__INSTRUMENT__', grab('INSTRUMENT_VAR'))
+// the Farsi template family's face — the eight Farsi gallery posters set it
+html = html.replace('__VAZIRMATN__', grab('VAZIRMATN_VAR'))
 
 // gallery poster thumbs — small renditions of the decks' public-domain
 // photos (scripts/gallery-photos/thumbs), inlined so the page stays

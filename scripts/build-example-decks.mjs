@@ -21,14 +21,19 @@ const shell = readFileSync(join(root, 'slides/dist-single/Bento_Slides.bento.htm
 
 // the deck-embedded faces (same technique as the landing build)
 const fontSrc = readFileSync(join(root, 'slides/src/fontdata.ts'), 'utf8')
-const font = (name) => fontSrc.match(new RegExp(`export const ${name}\\s*=\\s*'(data:[^']+)'`))[1]
+// FRAUNCES/INSTRUMENT are single-quoted in fontdata.ts, VAZIRMATN is
+// double-quoted — accept both, the data URI itself never contains a quote.
+const font = (name) => fontSrc.match(new RegExp(`export const ${name}\\s*=\\s*['"](data:[^'"]+)['"]`))[1]
 const FRAUNCES = font('FRAUNCES_900')
 const INSTRUMENT = font('INSTRUMENT_VAR')
+const VAZIRMATN = font('VAZIRMATN_VAR')
 const FONTS = {
-  assets: { 'font-fraunces': FRAUNCES, 'font-instrument': INSTRUMENT },
+  assets: { 'font-fraunces': FRAUNCES, 'font-instrument': INSTRUMENT, 'font-vazirmatn': VAZIRMATN },
   fonts: [
     { family: 'Fraunces', asset: 'font-fraunces', weight: '900' },
     { family: 'Instrument Sans', asset: 'font-instrument', weight: '100 900' },
+    // the Farsi template family rides on one variable Persian face, 100–900
+    { family: 'Vazirmatn', asset: 'font-vazirmatn', weight: '100 900' },
   ],
 }
 const FR = "Fraunces, Georgia, serif"
@@ -133,6 +138,38 @@ const drift = (ax, ay, fx, fy, px = 0, py = 0) => {
   }
   return `M0,0 L${pts.slice(1).join(' L')} Z`
 }
+
+// ——— Farsi template helpers (RTL) ——————————————————————————————————
+// The Farsi decks are laid out MIRRORED: the "start" edge is the right one, so
+// kickers sit top-right, page numbers bottom-left, ghost numerals left.
+const VZ = "'Vazirmatn', 'Tahoma', sans-serif"
+// Latin-digit → Persian-digit, for page furniture and written-out numbers.
+const fa = (v) => String(v).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d])
+// Persian text: right-aligned Vazirmatn by default. NEVER letterSpacing a
+// Persian string — the script's letters are JOINED, and tracking visually
+// breaks the joins. Hierarchy comes from weight, size and colour instead.
+const ftext = (o) => text({ align: 'right', fontFamily: VZ, ...o })
+// table cell with RTL default; bento cells take {html, align, color, bg, bold}
+const fcell = (html, o = {}) => ({
+  html, align: o.align ?? 'right',
+  ...(o.bold ? { bold: true } : {}), ...(o.color ? { color: o.color } : {}), ...(o.bg ? { bg: o.bg } : {}),
+})
+// data table on the Vazirmatn face — every TableStyle field is required by the
+// model, so this fills them all (zebra optional)
+const ftable = (o) => ({
+  id: o.id ?? id('tb'), type: 'table', x: o.x, y: o.y, w: o.w, h: o.h,
+  rotation: 0, opacity: 1, header: o.header ?? true,
+  columns: o.columns, rows: o.rows,
+  style: {
+    headerBg: o.headerBg, headerColor: o.headerColor,
+    ...(o.zebra ? { zebra: o.zebra } : {}),
+    borderColor: o.borderColor, borderWidth: o.borderWidth ?? 1,
+    cellPadX: o.cellPadX ?? 14, cellPadY: o.cellPadY ?? 11,
+    fontSize: o.fontSize ?? 15, fontFamily: VZ, color: o.color, radius: o.radius ?? 10,
+  },
+  ...(o.fx ? { fx: o.fx } : {}),
+})
+
 
 /**
  * The gallery faces a deck actually needs.
@@ -742,6 +779,1454 @@ function deckPicnic() {
   })
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// DECK E · «هلال» — گزارش مدیریتی فصلی (executive quarterly, Farsi/RTL)
+// Deep navy + brass on warm paper. The FOUR-CAST squares carry the deck:
+// cover motif → agenda badges → KPI cards → roadmap chips → closing row.
+// All copy RTL, Persian digits, NO letter-spacing (joined script).
+// ═══════════════════════════════════════════════════════════════════════
+function deckHelal() {
+  const NAVY = '#0F1D30', PANEL = '#17293F', PAPER = '#F4F1E9'
+  const BRASS = '#C9A24B', BRASS_SOFT = '#E0C583', BRASS_DEEP = '#A67F2E'
+  const STEEL = '#8195AD', INKT = '#1C2B40', SOFT = 'rgba(28,43,64,0.6)'
+  const UP = '#7FD6A4', DOWN = '#F0907C'
+  const GRAD_PANEL = grad(0, [0, '#122238'], [1, '#1B3049'])
+  const GRAD_BRASS = grad(20, [0, '#D9B364'], [1, '#B08A3E'])
+  const kick = (s, y = 84, color = BRASS_SOFT) => ftext({ x: 284, y, w: 900, h: 26, html: s, fontSize: 15, fontWeight: 600, color })
+  const pg = (n) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: STEEL, align: 'left', fontFamily: VZ })
+  // the four KPI tiles — same four ids from cover to close
+  const cast = ['hl-a', 'hl-b', 'hl-c', 'hl-d']
+
+  const s1 = slide({
+    id: 'hl-cover', background: NAVY, transition: 'none',
+    notes: 'قالب — «هلال»، گزارش مدیریتی فصلی راست‌به‌چپ. کفِ جوهری سرمه‌ای با اکسنت برنجی؛ چیدمان آینه‌ای: کیکر بالا-راست، شمارهٔ صفحه پایین-چپ. چهار مربع برنجی پایین-چپ «کستِ» morph هستند و تا اسلاید آخر با ما می‌مانند.',
+    elements: [
+      kick('هلدینگ هلال — گزارش فصلی هیئت‌مدیره'),
+      shape('rect', { x: 96, y: 118, w: 1088, h: 2, fill: 'rgba(201,162,75,0.45)' }),
+      ftext({ id: 'hl-title', x: 96, y: 190, w: 1088, h: 180, html: 'تابستان ۱۴۰۵', fontSize: 120, fontWeight: 800, color: PAPER, lineHeight: 1.05 }),
+      ftext({ x: 296, y: 420, w: 888, h: 44, html: 'مرور عملکرد، شاخص‌های کلیدی و برنامهٔ نیم‌سال دوم', fontSize: 22, color: STEEL, fx: { enter: 'fade-up', order: 1 } }),
+      ...cast.map((c, i) => shape('rect', { id: c, x: 96 + i * 34, y: 560, w: 20, h: 20, fill: BRASS, fillGradient: GRAD_BRASS })),
+      ftext({ x: 260, y: 560, w: 500, h: 22, html: 'چهار شاخص، یک روایت', fontSize: 14, color: STEEL }),
+      ftext({ x: 484, y: 654, w: 700, h: 22, html: 'سند داخلی — محرمانه · نسخهٔ ۱٫۰', fontSize: 12, color: 'rgba(129,149,173,0.65)' }),
+      pg(1),
+    ],
+  })
+
+  const agenda = ['یادداشت مدیرعامل', 'شاخص‌های کلیدی فصل', 'درآمد و اهداف', 'نگاه به نیم‌سال دوم']
+  const s2 = slide({
+    id: 'hl-agenda', background: PAPER, transition: 'morph',
+    notes: 'بیت morph اول: مربع‌های کاور به نشان‌های کنار فهرست می‌رسند و عنوان به گوشه می‌نشیند. جدول‌بندی آینه‌ای — نشان سمت راست، متن از راست.',
+    elements: [
+      ftext({ id: 'hl-title', x: 784, y: 72, w: 400, h: 64, html: 'فهرست', fontSize: 40, fontWeight: 800, color: SOFT }),
+      ...agenda.flatMap((item, i) => [
+        shape('rect', { id: cast[i], x: 1152, y: 208 + i * 110, w: 18, h: 18, fill: BRASS, fillGradient: GRAD_BRASS }),
+        ftext({ x: 200, y: 188 + i * 110, w: 920, h: 56, html: item, fontSize: 30, fontWeight: 700, color: INKT }),
+        shape('rect', { x: 96, y: 256 + i * 110, w: 1074, h: 1, fill: 'rgba(28,43,64,0.14)' }),
+      ]),
+      pg(2),
+    ],
+  })
+
+  const kpis = [
+    ['۴۸٫۲', 'میلیارد تومان درآمد', '+۱۲٪ نسبت به بهار', UP],
+    ['۱۲٬۴۰۰', 'مشتری فعال', '+۸٪ رشد ماهانه', UP],
+    ['۳۴٪', 'حاشیه سود ناخالص', '−۲٪ افت نسبت به بهار', DOWN],
+    ['۴٫۶', 'رضایت کاربران از ۵', '+۰٫۳ بهبود فصلی', UP],
+  ]
+  const s3 = slide({
+    id: 'hl-kpi', background: NAVY, transition: 'morph',
+    notes: 'بیت morph دوم: نشان‌های فهرست به چهار کارت شاخص تبدیل می‌شوند — همان چهار id، نقش تازه. اعداد درشت وزیرمتن؛ دلتاها رنگی، بدون نمودار.',
+    elements: [
+      kick('شاخص‌های کلیدی — فصل تابستان'),
+      ...kpis.flatMap(([num, label, delta, dc], i) => [
+        shape('rect', { id: cast[i], x: 96 + (3 - i) * 278, y: 200, w: 254, h: 264, fill: PANEL, fillGradient: GRAD_PANEL, radius: 14, stroke: 'rgba(129,149,173,0.25)', strokeWidth: 1 }),
+        shape('rect', { x: 96 + (3 - i) * 278 + 24, y: 226, w: 44, h: 3, fill: BRASS, fillGradient: GRAD_BRASS }),
+        ftext({ x: 120 + (3 - i) * 278, y: 256, w: 206, h: 76, html: num, fontSize: 52, fontWeight: 800, color: PAPER }),
+        ftext({ x: 120 + (3 - i) * 278, y: 342, w: 206, h: 52, html: label, fontSize: 17, color: STEEL, lineHeight: 1.45 }),
+        ftext({ x: 120 + (3 - i) * 278, y: 408, w: 206, h: 30, html: delta, fontSize: 15, fontWeight: 700, color: dc }),
+      ]),
+      ftext({ x: 96, y: 520, w: 1088, h: 32, html: 'حرکت کلی فصل مثبت بود؛ حاشیه سود نیازمند برنامهٔ مشخص در مهر است.', fontSize: 19, color: STEEL }),
+      pg(3),
+    ],
+  })
+
+  const s4 = slide({
+    id: 'hl-revenue', background: PAPER, transition: 'fade',
+    notes: 'نمودار ستونی برندشده: یک رنگ برنجی عمیق کافی است؛ تیتر درشت بالای نمودار و tooltip فارسی. اعداد نمونه‌اند — دادهٔ خودتان را جایگزین کنید.',
+    elements: [
+      ftext({ x: 284, y: 84, w: 900, h: 26, html: 'درآمد — چهار فصل منتهی به تابستان ۱۴۰۵', fontSize: 15, fontWeight: 600, color: BRASS_DEEP }),
+      ftext({ x: 96, y: 130, w: 1088, h: 90, html: 'مسیر رشد، بی‌وقفه.', fontSize: 56, fontWeight: 800, color: INKT }),
+      chart({ x: 96, y: 250, w: 1088, h: 400, preset: 'bar', option: {
+        grid: { left: 56, right: 16, top: 24, bottom: 34 },
+        xAxis: { type: 'category', data: ['پاییز ۱۴۰۴', 'زمستان ۱۴۰۴', 'بهار ۱۴۰۵', 'تابستان ۱۴۰۵'] },
+        yAxis: { type: 'value' },
+        color: [BRASS_DEEP],
+        tooltip: { trigger: 'item', formatter: '{b}: {c} میلیارد تومان' },
+        series: [{ type: 'bar', data: [31, 38, 43, 48.2], itemStyle: { color: BRASS_DEEP, borderRadius: 6 }, barWidth: 120 }],
+      }, fx: { enter: 'fade-up', order: 1 } }),
+      pg(4),
+    ],
+  })
+
+  const s5 = slide({
+    id: 'hl-targets', background: PAPER, transition: 'fade',
+    notes: 'جدول اهداف — سلول‌ها راست‌چین روی وزیرمتن؛ وضعیت‌ها رنگی و توپر. هدرِ جوهری، زیبرای بسیار ملایم.',
+    elements: [
+      ftext({ x: 284, y: 84, w: 900, h: 26, html: 'اهداف نیم‌سال دوم', fontSize: 15, fontWeight: 600, color: BRASS_DEEP }),
+      ftext({ x: 96, y: 130, w: 1088, h: 80, html: 'چه چیزی را وعده داده‌ایم.', fontSize: 48, fontWeight: 800, color: INKT }),
+      ftable({
+        x: 96, y: 250, w: 1088, h: 320,
+        columns: [{ w: 2 }, { w: 1.2 }, { w: 1.2 }, { w: 1.6 }],
+        rows: [
+          { cells: [fcell('شاخص', { bold: true }), fcell('هدف', { bold: true }), fcell('وضع فعلی', { bold: true }), fcell('ارزیابی', { bold: true })] },
+          { cells: [fcell('درآمد فصل'), fcell('۴۵ میلیارد'), fcell('۴۸٫۲ میلیارد'), fcell('محقق شد', { bold: true, color: '#1F7A5C' })] },
+          { cells: [fcell('مشتریان فعال'), fcell('۱۲٬۰۰۰'), fcell('۱۲٬۴۰۰'), fcell('محقق شد', { bold: true, color: '#1F7A5C' })] },
+          { cells: [fcell('حاشیه سود ناخالص'), fcell('۳۶٪'), fcell('۳۴٪'), fcell('نیازمند اقدام', { bold: true, color: '#B23B2E' })] },
+          { cells: [fcell('رضایت کاربران'), fcell('۴٫۵'), fcell('۴٫۶'), fcell('محقق شد', { bold: true, color: '#1F7A5C' })] },
+        ],
+        headerBg: INKT, headerColor: PAPER, zebra: 'rgba(28,43,64,0.045)',
+        borderColor: 'rgba(28,43,64,0.16)', color: INKT,
+      }),
+      pg(5),
+    ],
+  })
+
+  const s6 = slide({
+    id: 'hl-quote', background: PAPER, transition: 'fade',
+    notes: 'نقل‌قول مدیرعامل. گیومهٔ غول‌آسا سمت چپ (آینهٔ چیدمان)، خط برنجی کوچک پایین-راست — همین خط در اسلاید بعد به ستون فقرات نقشهٔ راه morph می‌شود.',
+    elements: [
+      ftext({ x: 96, y: 130, w: 220, h: 240, html: '”', fontSize: 220, fontWeight: 800, color: 'rgba(201,162,75,0.35)', align: 'left', lineHeight: 1 }),
+      ftext({ x: 256, y: 210, w: 928, h: 220, html: 'رقبای ما سرعت دارند؛ ما جهت داریم.<br>تابستان نشان داد این ترکیب برنده است.', fontSize: 42, fontWeight: 700, color: INKT, lineHeight: 1.55 }),
+      ftext({ x: 556, y: 470, w: 628, h: 32, html: '— آرش صالحی، مدیرعامل هلدینگ هلال', fontSize: 18, color: SOFT }),
+      shape('rect', { id: 'hl-rule', x: 1088, y: 560, w: 96, h: 3, fill: BRASS, fillGradient: GRAD_BRASS }),
+      pg(6),
+    ],
+  })
+
+  const miles = [
+    ['مهر', 'انتقال پلت‌فرم به معماری جدید', 1000],
+    ['آبان', 'عرضهٔ اپ موبایل نسخهٔ ۲', 490],
+    ['آذر', 'ورود به بازار صادراتی منطقه', 130],
+  ]
+  const s7 = slide({
+    id: 'hl-roadmap', background: NAVY, transition: 'morph',
+    notes: 'بیت morph سوم: خط برنجیِ نقل‌قول به ستون فقرات نقشهٔ راه بلند می‌شود. تایم‌لاین از راست به چپ خوانده می‌شود؛ گره‌ها متناوب بالا/پایین خط.',
+    elements: [
+      kick('نگاه به جلو — نیم‌سال دوم'),
+      shape('rect', { id: 'hl-rule', x: 96, y: 380, w: 1088, h: 3, fill: BRASS, fillGradient: GRAD_BRASS }),
+      ...miles.flatMap(([month, desc, x], i) => {
+        const up = i % 2 === 0
+        return [
+          shape('ellipse', { x: x - 2, y: 374, w: 16, h: 16, fill: NAVY, stroke: BRASS, strokeWidth: 2, shadow: { blur: 18, color: 'rgba(201,162,75,0.5)' }, fx: { enter: 'fade-up', order: i } }),
+          ftext({ x: x - 40, y: up ? 240 : 430, w: 260, h: 40, html: month, fontSize: 26, fontWeight: 800, color: PAPER, align: 'center', fx: { enter: 'fade-up', order: i } }),
+          ftext({ x: x - 40, y: up ? 288 : 478, w: 260, h: 56, html: desc, fontSize: 16, color: STEEL, align: 'center', lineHeight: 1.5, fx: { enter: 'fade-up', order: i } }),
+        ]
+      }),
+      ...cast.map((c, i) => shape('rect', { id: c, x: 96 + i * 26, y: 630, w: 14, h: 14, fill: BRASS, fillGradient: GRAD_BRASS })),
+      pg(7),
+    ],
+  })
+
+  const s8 = slide({
+    id: 'hl-close', background: NAVY, transition: 'morph',
+    notes: 'بستن: چیپ‌های نقشهٔ راه به ردیف مرکزی برمی‌گردند و عنوان بزرگ وسط می‌نشیند. جملهٔ پایانی را با نام سازمان خودتان عوض کنید.',
+    elements: [
+      ...cast.map((c, i) => shape('rect', { id: c, x: 592 + i * 30, y: 190, w: 18, h: 18, fill: BRASS, fillGradient: GRAD_BRASS })),
+      ftext({ x: 96, y: 270, w: 1088, h: 220, html: 'تابستانِ خوبی بود.<br>پاییز، بزرگ‌تر می‌شویم.', fontSize: 84, fontWeight: 800, color: PAPER, align: 'center', lineHeight: 1.3 }),
+      ftext({ x: 296, y: 530, w: 688, h: 32, html: 'گزارش کامل در فایل پیوست جلسه منتشر می‌شود.', fontSize: 18, color: STEEL, align: 'center' }),
+      ftext({ x: 296, y: 646, w: 688, h: 22, html: 'هلدینگ هلال — سازمانی فرضی برای یک قالب واقعی', fontSize: 12, color: 'rgba(129,149,173,0.55)', align: 'center' }),
+      pg(8),
+    ],
+  })
+
+  return doc({
+    title: 'هلال — قالب گزارش مدیریتی', withFonts: ['Vazirmatn'],
+    theme: { background: NAVY, color: PAPER, accent: BRASS, fontFamily: VZ },
+    present: { progress: true },
+    slides: [s1, s2, s3, s4, s5, s6, s7, s8],
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DECK F · «شتاب» — پیچ استارتاپ (startup pitch, Farsi/RTL)
+// Violet-black void, mesh-gradient blobs, huge display type. The two mesh
+// blobs and the argument PANEL morph through the narrative: pains panel →
+// solution card, blobs out to the corners and back for the close.
+// NOTE: countUp is deliberately unused here — it animates ASCII digits, and
+// Persian numerals would swap, not count.
+// ═══════════════════════════════════════════════════════════════════════
+function deckShetab() {
+  const VOID = '#0B0716', PANEL = '#150E28', LILAC = '#EDE9FF'
+  const DIM = 'rgba(196,186,232,0.68)', HOT = '#FF4FA3', VIO = '#8B7BFF'
+  const GRAD_VIO = grad(30, [0, '#6D5BFF'], [1, '#9F8BFF'])
+  const GRAD_HOT = grad(30, [0, '#FF4FA3'], [1, '#FF8A5C'])
+  const glow = (c, blur = 60) => ({ blur, color: c })
+  const kick = (s, color = VIO) => ftext({ x: 384, y: 84, w: 800, h: 26, html: s, fontSize: 15, fontWeight: 700, color })
+  const pg = (n) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: 'rgba(196,186,232,0.45)', align: 'left', fontFamily: VZ })
+
+  const s1 = slide({
+    id: 'sh-cover', background: VOID, transition: 'none',
+    notes: 'قالب — «شتاب»، پیچ استارتاپ فارسی. توده‌های گرادیان (mesh) با glow آرام نفس می‌کشند و در کل دک با morph جابه‌جا می‌شوند؛ پنل استدلال اسلاید مسئله در اسلاید راه‌حل به کارت متمرکز تبدیل می‌شود.',
+    elements: [
+      shape('ellipse', { id: 'sh-a', x: -80, y: -120, w: 560, h: 560, opacity: 0.55, fill: VIO, fillGradient: GRAD_VIO, shadow: glow('rgba(109,91,255,0.45)', 110), fx: { loop: { type: 'motion-path', path: drift(40, 28, 1, 2), duration: 26 } } }),
+      shape('ellipse', { id: 'sh-b', x: 880, y: 380, w: 480, h: 480, opacity: 0.5, fill: HOT, fillGradient: GRAD_HOT, shadow: glow('rgba(255,79,163,0.4)', 100), fx: { loop: { type: 'motion-path', path: drift(34, 24, 2, 1, 1), duration: 22 } } }),
+      kick('شتاب — پلتفرم تحلیل رشد'),
+      ftext({ id: 'sh-title', x: 96, y: 170, w: 1088, h: 300, html: 'رشد را<br>دقیق ببینید.', fontSize: 104, fontWeight: 800, color: LILAC, lineHeight: 1.18 }),
+      ftext({ x: 486, y: 500, w: 698, h: 40, html: 'همهٔ داده‌های محصول شما، در یک صفحهٔ قابل فهم', fontSize: 22, color: DIM, fx: { enter: 'fade-up', order: 1 } }),
+      shape('rect', { x: 1048, y: 580, w: 136, h: 44, radius: 22, fill: HOT, fillGradient: GRAD_HOT, shadow: glow('rgba(255,79,163,0.5)', 30) }),
+      ftext({ x: 1048, y: 590, w: 136, h: 28, html: 'شروع کنید', fontSize: 15, fontWeight: 700, color: '#FFF', align: 'center' }),
+      pg(1),
+    ],
+  })
+
+  const pains = [
+    'داشبوردهای شلوغی که هیچ‌کس باز نمی‌کند',
+    'گزارش‌های ماهانه‌ای که تا چاپ کهنه شده‌اند',
+    'سنجه‌هایی که با رشد واقعی بیگانه‌اند',
+  ]
+  const s2 = slide({
+    id: 'sh-problem', background: VOID, transition: 'morph',
+    notes: 'بیت morph اول: توده‌ها به دو گوشه جمع می‌شوند تا حرف اصلی نفس بکشد. پنل بزرگ، هر سه درد را نگه می‌دارد — همین پنل در اسلاید بعد به کارت راه‌حل تبدیل می‌شود.',
+    elements: [
+      shape('ellipse', { id: 'sh-a', x: 980, y: -160, w: 380, h: 380, opacity: 0.4, fill: VIO, fillGradient: GRAD_VIO, shadow: glow('rgba(109,91,255,0.4)', 90) }),
+      shape('ellipse', { id: 'sh-b', x: -140, y: 520, w: 340, h: 340, opacity: 0.38, fill: HOT, fillGradient: GRAD_HOT, shadow: glow('rgba(255,79,163,0.35)', 80) }),
+      kick('۰۱ · مسئله'),
+      ftext({ x: 96, y: 120, w: 1088, h: 175, html: 'داده دارید.<br>بینش ندارید.', fontSize: 64, fontWeight: 800, color: LILAC, lineHeight: 1.25 }),
+      shape('rect', { id: 'sh-card', x: 96, y: 320, w: 1088, h: 290, radius: 20, fill: PANEL, stroke: 'rgba(139,123,255,0.3)', strokeWidth: 1, shadow: glow('rgba(109,91,255,0.18)', 60) }),
+      ...pains.flatMap((p, i) => [
+        shape('ellipse', { x: 1140, y: 372 + i * 80, w: 12, h: 12, fill: HOT, fillGradient: GRAD_HOT, shadow: glow('rgba(255,79,163,0.7)', 12), fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 300, y: 356 + i * 80, w: 816, h: 44, html: p, fontSize: 24, fontWeight: 600, color: DIM, fx: { enter: 'fade-up', order: i } }),
+      ]),
+      pg(2),
+    ],
+  })
+
+  const s3 = slide({
+    id: 'sh-solution', background: VOID, transition: 'morph',
+    notes: 'بیت morph دوم: پنل دردها جمع می‌شود و به کارت راه‌حل تبدیل می‌شود — همان id «sh-card». تیتر بالای کارت همان جعبهٔ تیتر اسلاید قبل است.',
+    elements: [
+      ftext({ id: 'sh-title', x: 96, y: 120, w: 1088, h: 90, html: 'داده دارید.', fontSize: 40, fontWeight: 800, color: 'rgba(237,233,255,0.4)' }),
+      shape('ellipse', { x: 1060, y: 420, w: 300, h: 300, opacity: 0.35, fill: VIO, fillGradient: GRAD_VIO, shadow: glow('rgba(109,91,255,0.4)', 90) }),
+      shape('rect', { id: 'sh-card', x: 340, y: 240, w: 600, h: 360, radius: 24, fill: PANEL, stroke: 'rgba(139,123,255,0.5)', strokeWidth: 1.5, shadow: glow('rgba(109,91,255,0.3)', 80) }),
+      ftext({ x: 390, y: 290, w: 500, h: 120, html: '«شتاب» هر سنجه را به یک جواب روشن تبدیل می‌کند.', fontSize: 34, fontWeight: 800, color: LILAC, align: 'center', lineHeight: 1.5 }),
+      ...['تحلیل لحظه‌ای', 'هشدار هوشمند', 'پیش‌بینی رشد'].flatMap((f, i) => [
+        shape('ellipse', { x: 866, y: 437 + i * 54, w: 10, h: 10, fill: HOT, fillGradient: GRAD_HOT }),
+        ftext({ x: 430, y: 424 + i * 54, w: 420, h: 40, html: f, fontSize: 21, fontWeight: 600, color: DIM }),
+      ]),
+      pg(3),
+    ],
+  })
+
+  const feats = [
+    ['جریان زنده', 'هر رویداد محصول، همان لحظه روی نمودار می‌نشیند.'],
+    ['هشدار هوشمند', 'قبل از آن‌که نرخ ریزش بلند شود، پیام می‌گیرید.'],
+    ['پیش‌بینی', 'مدل شما را سه ماه جلوتر می‌بیند.'],
+  ]
+  const s4 = slide({
+    id: 'sh-product', background: VOID, transition: 'fade',
+    notes: 'ماکاپ محصول بدون تصویر: یک پنل تیره با نوار عنوان و ردیف‌های داده — همه شکل، نه عکس. سه ویژگی سمت راست پلکانی می‌آیند (بیت fade: ورود پلکانی فقط روی اسلاید non-morph اجرا می‌شود).',
+    elements: [
+      kick('۰۲ · محصول'),
+      shape('rect', { x: 96, y: 180, w: 620, h: 430, radius: 16, fill: PANEL, stroke: 'rgba(139,123,255,0.35)', strokeWidth: 1, shadow: glow('rgba(109,91,255,0.2)', 50) }),
+      shape('rect', { x: 96, y: 180, w: 620, h: 48, radius: 16, fill: '#1C1338' }),
+      ...[0, 1, 2].map((i) => shape('ellipse', { x: 664 - i * 26, y: 198, w: 13, h: 13, fill: [HOT, '#FFC24B', '#54D08A'][i] })),
+      ...[0, 1, 2, 3].flatMap((i) => [
+        shape('rect', { x: 140, y: 280 + i * 78, w: 220 - i * 30, h: 12, radius: 6, fill: VIO, opacity: 0.55 }),
+        shape('rect', { x: 640 - (160 + i * 40), y: 276 + i * 78, w: 150 + i * 40, h: 22, radius: 6, fill: i % 2 ? HOT : VIO, opacity: 0.35 }),
+        shape('rect', { x: 400, y: 282 + i * 78, w: 60, h: 10, radius: 5, fill: 'rgba(196,186,232,0.35)' }),
+      ]),
+      ...feats.flatMap(([t, d], i) => [
+        ftext({ x: 770, y: 200 + i * 140, w: 414, h: 44, html: t, fontSize: 28, fontWeight: 800, color: LILAC, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 770, y: 250 + i * 140, w: 414, h: 56, html: d, fontSize: 17, color: DIM, lineHeight: 1.6, fx: { enter: 'fade-up', order: i } }),
+      ]),
+      pg(4),
+    ],
+  })
+
+  const s5 = slide({
+    id: 'sh-traction', background: VOID, transition: 'fade',
+    notes: 'نمودار خطی رشد با گرادیان زیر خط — یک خط روی تاریکی «گران» به‌نظر می‌رسد؛ سه خط، داشبوردی. برچسب‌های محور فارسی.',
+    elements: [
+      kick('۰۳ · کشش'),
+      ftext({ x: 96, y: 120, w: 1088, h: 80, html: 'منحنی، حرف اول را می‌زند.', fontSize: 52, fontWeight: 800, color: LILAC }),
+      chart({ x: 96, y: 240, w: 1088, h: 400, preset: 'line', option: {
+        grid: { left: 56, right: 20, top: 24, bottom: 34 },
+        xAxis: { type: 'category', data: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور'] },
+        yAxis: { type: 'value' },
+        color: [VIO],
+        tooltip: { trigger: 'axis' },
+        series: [{ type: 'line', smooth: true, data: [320, 780, 1650, 3400, 6900, 12400],
+          lineStyle: { width: 3.5, color: VIO },
+          areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [{ offset: 0, color: 'rgba(139,123,255,0.35)' }, { offset: 1, color: 'rgba(139,123,255,0)' }] } },
+          symbol: 'circle', symbolSize: 8, itemStyle: { color: VIO } }],
+      }, fx: { enter: 'fade-up' } }),
+      pg(5),
+    ],
+  })
+
+  const tiers = [
+    ['پایه', 'رایگان', ['تا ۱٬۰۰۰ رویداد در ماه', 'یک داشبورد', 'پشتیبانی انجمن'], 'rgba(139,123,255,0.25)'],
+    ['حرفه‌ای', '۲٫۹ میلیون تومان', ['رویداد نامحدود', 'هشدار هوشمند', 'پشتیبانی ۲۴/۷'], HOT],
+    ['سازمانی', 'توافقی', ['استقرار اختصاصی', 'مدل سفارشی', 'مدیر موفقیت'], 'rgba(139,123,255,0.25)'],
+  ]
+  const s6 = slide({
+    id: 'sh-pricing', background: VOID, transition: 'fade',
+    notes: 'سه پلن، کارت میانی برجسته با حاشیهٔ داغ. قیمت‌ها با ارقام فارسی — template users خط قیمت را عوض می‌کنند.',
+    elements: [
+      kick('۰۴ · مدل درآمد'),
+      ...tiers.flatMap(([name, price, items, edge], i) => {
+        const cx = 96 + (2 - i) * 376
+        return [
+        shape('rect', { x: cx, y: 170, w: 336, h: 420, radius: 18, fill: PANEL, stroke: edge, strokeWidth: i === 1 ? 2 : 1, shadow: i === 1 ? glow('rgba(255,79,163,0.3)', 50) : undefined, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 24, y: 200, w: 288, h: 40, html: name, fontSize: 24, fontWeight: 800, color: i === 1 ? HOT : LILAC }),
+        ftext({ x: cx + 24, y: 252, w: 288, h: 60, html: price, fontSize: 34, fontWeight: 800, color: LILAC }),
+        ...items.map((it, j) => ftext({ x: cx + 24, y: 330 + j * 52, w: 288, h: 40, html: it, fontSize: 16, color: DIM })),
+        shape('rect', { x: cx + 24, y: 524, w: 288, h: 1, fill: 'rgba(196,186,232,0.18)' }),
+        ftext({ x: cx + 24, y: 538, w: 288, h: 30, html: ['برای همیشه رایگان', '۱۴ روز بازگشت بی‌قیدوشرط', 'قرارداد سالانه'][i], fontSize: 13, color: 'rgba(196,186,232,0.5)' }),
+        ]
+      }),
+      pg(6),
+    ],
+  })
+
+  const road = [
+    ['پاییز ۱۴۰۵', 'نسخهٔ عمومی ۱٫۰'],
+    ['زمستان ۱۴۰۵', 'یکپارچه‌سازی با درگاه‌های پرداخت'],
+    ['بهار ۱۴۰۶', 'پیش‌بینی خودکار چرخهٔ عمر'],
+    ['تابستان ۱۴۰۶', 'نسخهٔ صادراتی — بازار منطقه'],
+  ]
+  const s7 = slide({
+    id: 'sh-roadmap', background: VOID, transition: 'morph',
+    notes: 'ستون فقرات نقشهٔ راه از نوار پایین ماکاپ محصول می‌آید (id مشترک «sh-spine») و در اسلاید پایانی به خط امضا تبدیل می‌شود. گره‌ها راست به چپ.',
+    elements: [
+      kick('۰۵ · نقشهٔ راه'),
+      shape('rect', { id: 'sh-spine', x: 96, y: 390, w: 1088, h: 3, fill: VIO, fillGradient: grad(90, [0, HOT], [1, VIO]), shadow: glow('rgba(139,123,255,0.5)', 24) }),
+      ...road.flatMap(([when, what], i) => {
+        const x = 1120 - i * 320
+        const up = i % 2 === 0
+        return [
+          shape('ellipse', { x: x - 7, y: 383, w: 16, h: 16, fill: VOID, stroke: i === 0 ? HOT : VIO, strokeWidth: 2.5, fx: { enter: 'fade-up', order: i } }),
+          ftext({ x: x - 150, y: up ? 300 : 430, w: 300, h: 36, html: when, fontSize: 21, fontWeight: 800, color: LILAC, align: 'center', fx: { enter: 'fade-up', order: i } }),
+          ftext({ x: x - 150, y: up ? 342 : 472, w: 300, h: 44, html: what, fontSize: 15, color: DIM, align: 'center', lineHeight: 1.5, fx: { enter: 'fade-up', order: i } }),
+        ]
+      }),
+      pg(7),
+    ],
+  })
+
+  const team = [
+    ['ن', 'نگار رستمی', 'بنیان‌گذار و مدیرعامل'],
+    ['ک', 'کیان مرادی', 'هم‌بنیان‌گذار و مدیر فنی'],
+    ['س', 'سحر احمدی', 'مدیر رشد'],
+    ['م', 'مهدی طاهری', 'معمار ارشد داده'],
+  ]
+  const s8 = slide({
+    id: 'sh-team', background: VOID, transition: 'fade',
+    notes: 'تیم بدون عکس: حرف اول نام در دایرهٔ گرادیان — قالب را بدون نیاز به پرتره تحویل می‌دهد.',
+    elements: [
+      kick('۰۶ · تیم'),
+      ...team.flatMap(([ltr, name, role], i) => {
+        const cx = 96 + (3 - i) * 278
+        return [
+        shape('ellipse', { x: cx + 67, y: 210, w: 120, h: 120, fill: VIO, fillGradient: i % 2 ? GRAD_HOT : GRAD_VIO, shadow: glow(i % 2 ? 'rgba(255,79,163,0.4)' : 'rgba(109,91,255,0.4)', 40), fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 67, y: 244, w: 120, h: 56, html: ltr, fontSize: 40, fontWeight: 800, color: '#FFF', align: 'center' }),
+        ftext({ x: cx, y: 360, w: 254, h: 36, html: name, fontSize: 21, fontWeight: 700, color: LILAC, align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx, y: 400, w: 254, h: 40, html: role, fontSize: 14, color: DIM, align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ]
+      }),
+      ftext({ x: 96, y: 540, w: 1088, h: 34, html: 'ده سال تجربهٔ داده، یک تیم، یک هدف: تصمیم‌های سریع‌تر.', fontSize: 19, color: DIM, align: 'center' }),
+      pg(8),
+    ],
+  })
+
+  const s9 = slide({
+    id: 'sh-ask', background: VOID, transition: 'zoom',
+    notes: 'اسلاید درخواست — بزرگ‌ترین عدد دک. تخصیص سرمایه در سه قلم زیرش.',
+    elements: [
+      shape('ellipse', { x: -60, y: 400, w: 360, h: 360, opacity: 0.4, fill: HOT, fillGradient: GRAD_HOT, shadow: glow('rgba(255,79,163,0.4)', 90) }),
+      ftext({ x: 96, y: 150, w: 1088, h: 60, html: '۰۷ · درخواست', fontSize: 16, fontWeight: 700, color: HOT, align: 'center' }),
+      ftext({ x: 96, y: 230, w: 1088, h: 140, html: 'جذب سرمایه: ۲ میلیون دلار', fontSize: 76, fontWeight: 800, color: LILAC, align: 'center' }),
+      ...[['۶۰٪', 'توسعهٔ محصول و مهندسی'], ['۲۵٪', 'رشد و ورود به بازار'], ['۱۵٪', 'زیرساخت و امنیت']].flatMap(([p, d], i) => [
+        ftext({ x: 96 + (2 - i) * 376, y: 440, w: 336, h: 60, html: p, fontSize: 40, fontWeight: 800, color: VIO, align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 96 + (2 - i) * 376, y: 508, w: 336, h: 40, html: d, fontSize: 16, color: DIM, align: 'center', fx: { enter: 'fade-up', order: i } }),
+      ]),
+      pg(9),
+    ],
+  })
+
+  const s10 = slide({
+    id: 'sh-close', background: VOID, transition: 'morph',
+    notes: 'بستن: توده‌ها به مرکز برمی‌گردند و ستون فقرات نقشهٔ راه به خط امضا زیر تیتر تبدیل می‌شود.',
+    elements: [
+      shape('ellipse', { id: 'sh-a', x: 120, y: 60, w: 300, h: 300, opacity: 0.5, fill: VIO, fillGradient: GRAD_VIO, shadow: glow('rgba(109,91,255,0.45)', 100), fx: { loop: { type: 'motion-path', path: drift(26, 20, 1, 2), duration: 24 } } }),
+      shape('ellipse', { id: 'sh-b', x: 860, y: 360, w: 300, h: 300, opacity: 0.45, fill: HOT, fillGradient: GRAD_HOT, shadow: glow('rgba(255,79,163,0.4)', 90), fx: { loop: { type: 'motion-path', path: drift(22, 18, 2, 1, 1), duration: 21 } } }),
+      ftext({ id: 'sh-title', x: 96, y: 230, w: 1088, h: 225, html: 'بیایید رشد را<br>دقیق ببینیم.', fontSize: 84, fontWeight: 800, color: LILAC, align: 'center', lineHeight: 1.25 }),
+      shape('rect', { id: 'sh-spine', x: 490, y: 470, w: 300, h: 4, radius: 2, fill: HOT, fillGradient: GRAD_HOT, shadow: glow('rgba(255,79,163,0.5)', 20) }),
+      ftext({ x: 296, y: 520, w: 688, h: 34, html: 'shetab.example — استارتاپی فرضی برای یک قالب واقعی', fontSize: 16, color: DIM, align: 'center' }),
+      pg(10),
+    ],
+  })
+
+  return doc({
+    title: 'شتاب — قالب پیچ استارتاپ', withFonts: ['Vazirmatn'],
+    theme: { background: VOID, color: LILAC, accent: HOT, fontFamily: VZ },
+    present: { progress: true },
+    slides: [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10],
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DECK G · «آتلیه» — درس و کارگاه (education/workshop, Farsi/RTL)
+// Warm cream paper with a deep-green chalkboard interlude. The signature
+// morph: the rule-of-thirds GRID itself (four line ids + the subject dot)
+// slides from the chalkboard to a paper exercise and re-lights itself.
+// ═══════════════════════════════════════════════════════════════════════
+function deckAtelier() {
+  const CREAM = '#F7F3E8', BOARD = '#20402F', INKT = '#26251C'
+  const TERRA = '#C96F4A', BLUE = '#4A7BA6', CHALKY = '#E8B84B'
+  const SOFT = 'rgba(38,37,28,0.6)', CHALK = 'rgba(240,238,228,0.85)'
+  const kick = (s, color = TERRA) => ftext({ x: 384, y: 84, w: 800, h: 26, html: s, fontSize: 15, fontWeight: 700, color })
+  const pg = (n, dark) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: dark ? 'rgba(240,238,228,0.55)' : SOFT, align: 'left', fontFamily: VZ })
+  // the rule-of-thirds grid — four line ids that travel between boards
+  const grid = (chalk, x1 = 426, x2 = 853, y1 = 269, y2 = 451) => [
+    shape('rect', { id: 'at-v1', x: x1, y: 100, w: 1.5, h: 520, fill: chalk, opacity: 0.55 }),
+    shape('rect', { id: 'at-v2', x: x2, y: 100, w: 1.5, h: 520, fill: chalk, opacity: 0.55 }),
+    shape('rect', { id: 'at-h1', x: 90, y: y1, w: 1100, h: 1.5, fill: chalk, opacity: 0.55 }),
+    shape('rect', { id: 'at-h2', x: 90, y: y2, w: 1100, h: 1.5, fill: chalk, opacity: 0.55 }),
+  ]
+  const goals = [
+    ['چشم‌تان را قاب بدهد', 'قبل از دوربین، ترکیب‌بندی را ببینید.', TERRA],
+    ['شبکه را بفهمید', 'یک‌سوم، تعادل و نقطهٔ طلایی.', BLUE],
+    ['شکستن را یاد بگیرید', 'قاعده را که بلد شدید، عمداً بشکنید.', CHALKY],
+  ]
+
+  const s1 = slide({
+    id: 'at-cover', background: CREAM, transition: 'none',
+    notes: 'قالب — «آتلیه»، قالب درس و کارگاه. کاغذ گرم با نوارهای چسب کاج (چرخیده ±۳ درجه) — نوستالژی دفتر مشق. نوارها و نقطهٔ تراکوتا در اسلاید اهداف به نشان‌های شماره‌دار morph می‌شوند.',
+    elements: [
+      shape('rect', { id: 'at-o1', x: 140, y: 58, w: 130, h: 30, rotation: -4, fill: 'rgba(232,184,75,0.85)' }),
+      shape('rect', { id: 'at-o2', x: 990, y: 66, w: 130, h: 30, rotation: 3, fill: 'rgba(74,123,166,0.75)' }),
+      kick('کارگاه آتلیه · جلسهٔ سوم'),
+      ftext({ id: 'at-title', x: 96, y: 190, w: 1088, h: 260, html: 'ترکیب‌بندی را<br>دیدنی کنید.', fontSize: 92, fontWeight: 800, color: INKT, lineHeight: 1.25 }),
+      ftext({ x: 486, y: 470, w: 698, h: 36, html: 'با مهسا کریمی — طراح ارشد و عکاس', fontSize: 21, color: SOFT, fx: { enter: 'fade-up', order: 1 } }),
+      shape('rect', { id: 'at-o3', x: 96, y: 480, w: 26, h: 26, fill: TERRA }),
+      ftext({ x: 140, y: 482, w: 320, h: 26, html: 'پنجشنبه‌ها، ۱۶ تا ۱۸', fontSize: 16, fontWeight: 600, color: SOFT, align: 'left' }),
+      pg(1),
+    ],
+  })
+
+  const s2 = slide({
+    id: 'at-goals', background: CREAM, transition: 'morph',
+    notes: 'بیت morph اول: نوارهای چسب و نقطهٔ تراکوتا به دایره‌های شماره‌دار اهداف تبدیل می‌شوند — چرخش‌ها صفر می‌شوند و رنگ‌ها می‌مانند.',
+    elements: [
+      ftext({ id: 'at-title', x: 684, y: 72, w: 500, h: 64, html: 'ترکیب‌بندی را دیدنی کنید.', fontSize: 32, fontWeight: 800, color: 'rgba(38,37,28,0.45)' }),
+      ...goals.flatMap(([t, d, c], i) => [
+        shape('ellipse', { id: `at-o${i + 1}`, x: 1098, y: 226 + i * 130, w: 64, h: 64, fill: c, shadow: { y: 4, blur: 16, color: 'rgba(38,37,28,0.18)' } }),
+        ftext({ x: 1098, y: 240 + i * 130, w: 64, h: 40, html: fa(i + 1), fontSize: 26, fontWeight: 800, color: '#FFF', align: 'center' }),
+        ftext({ x: 340, y: 220 + i * 130, w: 720, h: 44, html: t, fontSize: 30, fontWeight: 800, color: INKT }),
+        ftext({ x: 340, y: 270 + i * 130, w: 720, h: 32, html: d, fontSize: 18, color: SOFT }),
+      ]),
+      pg(2),
+    ],
+  })
+
+  const s3 = slide({
+    id: 'at-board', background: BOARD, transition: 'fade',
+    notes: 'تخته‌سیاه: شبکهٔ یک‌سوم با گچ (خطوط سفید نیمه‌شفاف) و سوژهٔ دایره‌ای روی تقاطع راست-بالا — «نقطهٔ طلایی». همین چهار خط در اسلاید بعد به کاغذ می‌آیند.',
+    elements: [
+      kick('قانون یک‌سوم', CHALKY),
+      ...grid(CHALK),
+      shape('ellipse', { id: 'at-dot', x: 793, y: 209, w: 120, h: 120, fill: 'rgba(201,111,74,0.9)', stroke: CHALK, strokeWidth: 2 }),
+      ftext({ x: 563, y: 606, w: 580, h: 56, html: 'سوژه روی تقاطع — نقطهٔ طلایی', fontSize: 17, color: CHALK, align: 'center' }),
+      pg(3, true),
+    ],
+  })
+
+  const s4 = slide({
+    id: 'at-exercise', background: CREAM, transition: 'morph',
+    notes: 'بیت morph دوم — امضای این قالب: شبکه گچی از تخته به کاغذ می‌آید (همان چهار id؛ رنگ سفید گچی → جوهر کم‌رنگ) و سوژه به تقاطع چپ-پایین می‌رود تا «تعادل با فضای منفی» را نشان دهد.',
+    elements: [
+      kick('همان شبکه، این بار روی کاغذ'),
+      ...grid('rgba(38,37,28,0.5)'),
+      shape('ellipse', { id: 'at-dot', x: 386, y: 411, w: 80, h: 80, fill: BLUE, shadow: { y: 4, blur: 18, color: 'rgba(38,37,28,0.2)' } }),
+      ftext({ x: 90, y: 560, w: 700, h: 32, html: 'سوژه کوچک، پایین-چپ؛ تنفس قاب از فضای خالی می‌آید.', fontSize: 17, color: SOFT, align: 'left' }),
+      ftext({ x: 660, y: 130, w: 524, h: 44, html: 'یک‌سوم بالا برای آسمان، یک‌سوم پایین برای سوژه.', fontSize: 20, fontWeight: 700, color: INKT, fx: { enter: 'fade-up', order: 2 } }),
+      pg(4),
+    ],
+  })
+
+  const steps = [
+    ['قاب را ببندید', 'کل صحنه را ببینید، بعد مرزها را مشخص کنید.'],
+    ['شبکه را بیاورید', 'چهار خط ذهنی — گوشه‌ها را رها نکنید.'],
+    ['سوژه را جابه‌جا کنید', 'تقاطع‌ها را امتحان کنید؛ وسط، آخرین گزینه است.'],
+    ['سه قاب بگیرید', 'مرکزی، یک‌سوم، شکسته — بعد قضاوت کنید.'],
+  ]
+  const s5 = slide({
+    id: 'at-steps', background: CREAM, transition: 'fade',
+    notes: 'چهار گام — ردیف‌های شماره‌دار با ورود پلکانی (بیت fade). شماره‌ها با ارقام فارسی داخل مربع‌های تراکوتا.',
+    elements: [
+      kick('چهار گام تا قاب بهتر'),
+      ...steps.flatMap(([t, d], i) => [
+        shape('rect', { x: 1128, y: 170 + i * 118, w: 56, h: 56, radius: 12, fill: i % 2 ? BLUE : TERRA, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 1128, y: 182 + i * 118, w: 56, h: 36, html: fa(i + 1), fontSize: 24, fontWeight: 800, color: '#FFF', align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 300, y: 166 + i * 118, w: 800, h: 40, html: t, fontSize: 26, fontWeight: 800, color: INKT, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 300, y: 212 + i * 118, w: 800, h: 32, html: d, fontSize: 17, color: SOFT, fx: { enter: 'fade-up', order: i } }),
+      ]),
+      pg(5),
+    ],
+  })
+
+  const s6 = slide({
+    id: 'at-drill', background: CHALKY, transition: 'zoom',
+    notes: 'اسلاید تمرین — زمزهٔ رنگی کامل، تایپ درشت. زمان تمرین داخل چیپ جوهری.',
+    elements: [
+      ftext({ x: 96, y: 170, w: 1088, h: 60, html: 'تمرین جلسه', fontSize: 24, fontWeight: 700, color: 'rgba(38,37,28,0.65)', align: 'center' }),
+      ftext({ x: 96, y: 240, w: 1088, h: 130, html: 'یک سوژه، سه قاب.', fontSize: 96, fontWeight: 800, color: INKT, align: 'center' }),
+      ftext({ x: 240, y: 420, w: 800, h: 44, html: 'قاب مرکزی، قاب یک‌سوم، قاب شکسته — هر سه را کنار هم بگذارید.', fontSize: 22, color: 'rgba(38,37,28,0.75)', align: 'center' }),
+      shape('rect', { x: 566, y: 510, w: 148, h: 48, radius: 24, fill: INKT }),
+      ftext({ x: 566, y: 522, w: 148, h: 30, html: '۱۰ دقیقه', fontSize: 18, fontWeight: 700, color: CHALKY, align: 'center' }),
+      pg(6),
+    ],
+  })
+
+  const wrongs = [
+    ['همیشه وسط', 'وسطِ بی‌دلیل، قاب را بی‌جان می‌کند.'],
+    ['شلوغیِ لبه‌ها', 'چیزی که نصفه در قاب است، نجات نمی‌دهد.'],
+    ['افقِ کجِ تصادفی', 'کج بودن باید معنا داشته باشد، نه خستگی.'],
+  ]
+  const s7 = slide({
+    id: 'at-mistakes', background: CREAM, transition: 'fade',
+    notes: 'سه اشتباه رایج در کارت‌های کاغذی با ضربدر تراکوتا. قالب کارت‌ها را با محتوای درس خودتان عوض کنید.',
+    elements: [
+      kick('اشتباه‌های رایج'),
+      ...wrongs.flatMap(([t, d], i) => {
+        const cx = 96 + (2 - i) * 376
+        return [
+        shape('rect', { x: cx, y: 190, w: 336, h: 340, radius: 16, fill: '#FFFDF7', stroke: 'rgba(38,37,28,0.12)', strokeWidth: 1, shadow: { y: 10, blur: 28, color: 'rgba(38,37,28,0.1)' }, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 288, y: 216, w: 24, h: 50, html: '✕', fontSize: 34, fontWeight: 800, color: TERRA, align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 24, y: 290, w: 288, h: 44, html: t, fontSize: 26, fontWeight: 800, color: INKT, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 24, y: 344, w: 288, h: 80, html: d, fontSize: 16, color: SOFT, lineHeight: 1.65, fx: { enter: 'fade-up', order: i } }),
+        shape('rect', { x: cx + 24, y: 468, w: 288, h: 1.5, fill: 'rgba(38,37,28,0.14)' }),
+        ftext({ x: cx + 24, y: 482, w: 288, h: 28, html: 'پادزهر: ' + ['سوژه را از مرکز خارج کن', 'نیمهٔ ناقص را کامل حذف کن', 'افق را صاف کن، بعد بشکن'][i], fontSize: 13.5, fontWeight: 600, color: TERRA, fx: { enter: 'fade-up', order: i } }),
+        ]
+      }),
+      pg(7),
+    ],
+  })
+
+  const s8 = slide({
+    id: 'at-recap', background: CREAM, transition: 'morph',
+    notes: 'بیت morph سوم: نشان‌های اهداف به ردیف تیکِ جمع‌بندی می‌روند — حلقهٔ روایت بسته می‌شود.',
+    elements: [
+      ftext({ x: 96, y: 140, w: 1088, h: 80, html: 'چه آموختیم.', fontSize: 54, fontWeight: 800, color: INKT }),
+      ...goals.flatMap(([t], i) => [
+        shape('ellipse', { id: `at-o${i + 1}`, x: 1020 - i * 320, y: 300, w: 48, h: 48, fill: goals[i][2] }),
+        ftext({ x: 1020 - i * 320, y: 308, w: 48, h: 32, html: '✓', fontSize: 22, fontWeight: 800, color: '#FFF', align: 'center' }),
+        ftext({ x: 700 - i * 320, y: 306, w: 300, h: 40, html: t, fontSize: 21, fontWeight: 700, color: INKT }),
+      ]),
+      ftext({ x: 240, y: 470, w: 944, h: 36, html: 'قاعده را بلد باشید تا بشکنیدش — جلسهٔ بعد: نور.', fontSize: 19, color: SOFT, align: 'center' }),
+      pg(8),
+    ],
+  })
+
+  const s9 = slide({
+    id: 'at-homework', background: BOARD, transition: 'fade',
+    notes: 'تکلیف روی تخته — قالب درس با منبع و ضرب‌الاجل.',
+    elements: [
+      kick('تکلیف این هفته', CHALKY),
+      ftext({ x: 96, y: 170, w: 1088, h: 90, html: 'پنج قاب با شبکهٔ یک‌سوم', fontSize: 54, fontWeight: 800, color: CHALK }),
+      ftext({ x: 336, y: 300, w: 848, h: 40, html: 'از یک سوژهٔ ثابت — فقط جای سوژه و افق را عوض کنید.', fontSize: 20, color: 'rgba(240,238,228,0.75)' }),
+      shape('rect', { x: 1074, y: 400, w: 110, h: 2, fill: CHALKY }),
+      ftext({ x: 336, y: 430, w: 848, h: 36, html: 'تحویل: تا پنجشنبه، ساعت ۱۶ — گروه کارگاه', fontSize: 17, color: 'rgba(240,238,228,0.65)' }),
+      ftext({ x: 336, y: 540, w: 848, h: 32, html: 'برای مطالعه: فصل ۳ کتاب «زبان بصری» — نسخهٔ کتابخانهٔ کارگاه', fontSize: 15, color: 'rgba(240,238,228,0.5)' }),
+      pg(9, true),
+    ],
+  })
+
+  return doc({
+    title: 'آتلیه — قالب درس و کارگاه', withFonts: ['Vazirmatn'],
+    theme: { background: CREAM, color: INKT, accent: TERRA, fontFamily: VZ },
+    slides: [s1, s2, s3, s4, s5, s6, s7, s8, s9],
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DECK H · «نمایش» — نمونه‌کار استودیو (design-studio portfolio, Farsi/RTL)
+// Charcoal + bone + persimmon. Photography: the gallery's public-domain set
+// (Met CC0 vases, LOC pressroom, LOC state fair) re-cast as a fictional
+// studio's selected works — three sections, each divider's colour block
+// MORPHS down to a small square on its own gallery slide.
+// ═══════════════════════════════════════════════════════════════════════
+function deckNamayesh() {
+  const CHAR = '#191817', BONE = '#EFECE4', PERS = '#D96C3F'
+  const CLAY = '#B4744C', GRAPH = '#3A3733'
+  const SOFT = 'rgba(239,236,228,0.6)', INKS = 'rgba(25,24,23,0.62)'
+  const GRAD_CLAY = grad(0, [0, '#C58158'], [1, '#A5623C'])
+  const GRAD_GRAPH = grad(0, [0, '#4A463F'], [1, '#2C2A26'])
+  const GRAD_PERS = grad(0, [0, '#E67E4E'], [1, '#C75B31'])
+  const kick = (s, color = PERS) => ftext({ x: 384, y: 84, w: 800, h: 26, html: s, fontSize: 15, fontWeight: 700, color })
+  const pg = (n, dark) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: dark ? SOFT : INKS, align: 'left', fontFamily: VZ })
+  // divider recipe: ghost numeral left, big section title right, colour block
+  const divider = (sid, bg, num, title, desc, block, g, trans, page) => slide({
+    id: sid, background: bg, transition: trans,
+    elements: [
+      ftext({ x: 60, y: 170, w: 400, h: 340, html: num, fontSize: 250, fontWeight: 800, color: 'rgba(239,236,228,0.08)', align: 'left', lineHeight: 1 }),
+      kick(`${num} · ${title} — نمونه‌کارهای منتخب`),
+      ftext({ x: 556, y: 250, w: 628, h: 130, html: title, fontSize: 96, fontWeight: 800, color: BONE }),
+      ftext({ x: 556, y: 400, w: 628, h: 60, html: desc, fontSize: 20, color: SOFT, lineHeight: 1.6 }),
+      shape('rect', { id: block, x: 116, y: 250, w: 340, h: 400, radius: 20, fill: g[0], fillGradient: g[1], shadow: { y: 20, blur: 60, color: 'rgba(0,0,0,0.45)' } }),
+      pg(page, true),
+    ],
+  })
+
+  const s1 = slide({
+    id: 'nm-cover', background: CHAR, transition: 'none',
+    notes: 'قالب — «نمایش»، نمونه‌کار استودیو طراحی. تیر کامل با سه فصل: اشیاء، چاپ، فضا. بلوک رنگی هر فصل در گالری همان فصل به مربع کوچک caption morph می‌شود. عکس‌ها پابلیک‌دومین‌اند (مت موزیم CC0 و کتابخانهٔ کنگره) — با آثار خودتان عوضشان کنید.',
+    elements: [
+      ftext({ id: 'nm-title', x: 96, y: 150, w: 1088, h: 260, html: 'نمایش', fontSize: 200, fontWeight: 800, color: BONE, lineHeight: 1 }),
+      shape('rect', { x: 1024, y: 420, w: 160, h: 12, fill: PERS, fillGradient: GRAD_PERS }),
+      ftext({ x: 436, y: 460, w: 748, h: 44, html: 'استودیو طراحی — اشیاء، چاپ، فضا', fontSize: 26, fontWeight: 600, color: SOFT }),
+      ftext({ x: 436, y: 620, w: 748, h: 26, html: 'نمونه‌کارهای منتخب ۱۴۰۴ · تهران', fontSize: 14, color: 'rgba(239,236,228,0.45)' }),
+      pg(1, true),
+    ],
+  })
+
+  const cats = [
+    ['اشیاء', 'دوازده شیء، یک مجموعه', CLAY, GRAD_CLAY, 'nm-a'],
+    ['چاپ', 'پوستر و کتاب', GRAPH, GRAD_GRAPH, 'nm-b'],
+    ['فضا', 'نمایشگاه و دکور', PERS, GRAD_PERS, 'nm-c'],
+  ]
+  const s2 = slide({
+    id: 'nm-index', background: BONE, transition: 'morph',
+    notes: 'بیت morph اول: عنوان کاور به گوشه می‌نشیند. سه ردیف فصل با نشان رنگی — همین نشان‌ها در اسلایدهای بعد بلوک‌های بزرگ می‌شوند.',
+    elements: [
+      ftext({ id: 'nm-title', x: 784, y: 72, w: 400, h: 64, html: 'نمایش', fontSize: 40, fontWeight: 800, color: INKS }),
+      ...cats.flatMap(([t, d, c, g, bid], i) => [
+        shape('rect', { id: bid, x: 1108, y: 200 + i * 140, w: 76, h: 76, radius: 16, fill: c, fillGradient: g, shadow: { y: 6, blur: 18, color: 'rgba(25,24,23,0.2)' } }),
+        ftext({ x: 300, y: 198 + i * 140, w: 760, h: 48, html: t, fontSize: 34, fontWeight: 800, color: '#191817' }),
+        ftext({ x: 300, y: 254 + i * 140, w: 760, h: 32, html: d, fontSize: 18, color: INKS }),
+        shape('rect', { x: 96, y: 292 + i * 140, w: 1088, h: 1, fill: 'rgba(25,24,23,0.14)' }),
+      ]),
+      pg(2),
+    ],
+  })
+
+  const s3 = divider('nm-div1', CHAR, '۰۱', 'اشیاء', 'مجموعهٔ سفال نما — دوازده شیء دست‌ساز، چرخ و کورهٔ واحد.', 'nm-a', [CLAY, GRAD_CLAY], 'morph', 3)
+  s3.notes = 'بیت morph دوم: نشان ردیف «اشیاء» به بلوک بزرگ فصل تبدیل می‌شود. عنوان‌گذاری فصل‌ها با عدد شبحِ بزرگ سمت چپ.'
+
+  const s4 = slide({
+    id: 'nm-obj', background: BONE, transition: 'morph',
+    notes: 'بیت morph سوم: بلوک بزرگ به مربع کوچک کنار عنوان فصل برمی‌گردد. گرید سه‌تایی عکس با کپشن و اعتبار منبع.',
+    elements: [
+      shape('rect', { id: 'nm-a', x: 1128, y: 84, w: 56, h: 56, radius: 12, fill: CLAY, fillGradient: GRAD_CLAY }),
+      ftext({ x: 384, y: 92, w: 700, h: 44, html: 'اشیاء — مجموعهٔ سفال نما', fontSize: 28, fontWeight: 800, color: '#191817' }),
+      ...[['ph-obj1', 'کوزهٔ نوک‌دار', 816], ['ph-obj2', 'ظرف نقاب بز', 456], ['ph-obj3', 'گلدان ۱۸۷۹', 96]].flatMap(([ph, cap, x], i) => [
+        img({ asset: ph, x, y: 190, w: 368, h: 360, radius: 12, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x, y: 566, w: 368, h: 30, html: cap, fontSize: 17, fontWeight: 700, color: '#191817', align: 'center', fx: { enter: 'fade-up', order: i } }),
+      ]),
+      ftext({ x: 96, y: 636, w: 1088, h: 24, html: 'عکس‌ها: مت موزیم، open access — CC0', fontSize: 11, color: INKS, align: 'center' }),
+      pg(4),
+    ],
+  })
+
+  const s5 = divider('nm-div2', CHAR, '۰۲', 'چاپ', 'پوسترهای حروفی و کتاب سالانه — جوهر، کاغذ، شبکه.', 'nm-b', [GRAPH, GRAD_GRAPH], 'morph', 5)
+  s5.notes = 'بیت morph چهارم: نشان «چاپ» به بلوک فصل. زیر بلوک، عکس چاپخانهٔ ۱۹۴۲ با اسکریم — فصل چاپ روی خودِ چاپ سوار است.'
+
+  const s6 = slide({
+    id: 'nm-print', background: BONE, transition: 'morph',
+    notes: 'بیت morph پنجم: بلوک به مربع caption. یک عکس بزرگ + یک عمودی — دو قاب با دو نسبت، شبکه را زنده نگه می‌دارد.',
+    elements: [
+      shape('rect', { id: 'nm-b', x: 1128, y: 84, w: 56, h: 56, radius: 12, fill: GRAPH, fillGradient: GRAD_GRAPH }),
+      ftext({ x: 384, y: 92, w: 700, h: 44, html: 'چاپ — سالانهٔ نشر هفت', fontSize: 28, fontWeight: 800, color: '#191817' }),
+      img({ asset: 'ph-print1', x: 96, y: 190, w: 700, h: 400, radius: 12, fx: { enter: 'fade-up' } }),
+      img({ asset: 'ph-print2', x: 828, y: 190, w: 356, h: 400, radius: 12, fx: { enter: 'fade-up', order: 1 } }),
+      ftext({ x: 96, y: 606, w: 700, h: 30, html: 'چاپ حروفِ سربی، همان‌قدر امروزی.', fontSize: 17, fontWeight: 700, color: '#191817' }),
+      ftext({ x: 828, y: 606, w: 356, h: 30, html: 'چاپخانهٔ نیویورک‌تایمز، ۱۹۴۲', fontSize: 14, color: INKS }),
+      ftext({ x: 96, y: 640, w: 1088, h: 22, html: 'عکس‌ها: کتابخانهٔ کنگره — پابلیک دومین', fontSize: 11, color: INKS, align: 'center' }),
+      pg(6),
+    ],
+  })
+
+  const s7 = divider('nm-div3', CHAR, '۰۳', 'فضا', 'غرفه، نمایشگاه و دکور — از طرح تا اجرا.', 'nm-c', [PERS, GRAD_PERS], 'morph', 7)
+  s7.notes = 'بیت morph ششم: نشان «فضا» به بلوک فصل. تصویر چرخ‌وفلک جشنوارهٔ ۱۹۴۱ — مقیاس، موضوع این فصل است.'
+
+  const s8 = slide({
+    id: 'nm-space', background: BONE, transition: 'morph',
+    notes: 'بیت morph هفتم: بلوک به مربع caption. عکس تمام‌عرض با کپشن روایت‌گونه — عریض‌ترین قاب دک.',
+    elements: [
+      shape('rect', { id: 'nm-c', x: 1128, y: 84, w: 56, h: 56, radius: 12, fill: PERS, fillGradient: GRAD_PERS }),
+      ftext({ x: 384, y: 92, w: 700, h: 44, html: 'فضا — غرفهٔ جشنواره', fontSize: 28, fontWeight: 800, color: '#191817' }),
+      img({ asset: 'ph-spc1', x: 96, y: 180, w: 1088, h: 400, radius: 12, fx: { enter: 'fade-up' } }),
+      ftext({ x: 96, y: 596, w: 1088, h: 30, html: 'مقیاس بزرگ، جزئیات کوچک — غرفه‌ای که از دور و نزدیک دو حرف متفاوت می‌زند.', fontSize: 17, fontWeight: 700, color: '#191817' }),
+      ftext({ x: 96, y: 640, w: 1088, h: 22, html: 'عکس: جک دِلانو، جشنوارهٔ ایالتی ورمانت ۱۹۴۱ — کتابخانهٔ کنگره، پابلیک دومین', fontSize: 11, color: INKS, align: 'center' }),
+      pg(8),
+    ],
+  })
+
+  const servs = [
+    ['هویت بصری', 'لوگو، رنگ، حروف — سیستمی که تکرارپذیر است.'],
+    ['طراحی آثار', 'از سفال تا چاپ — اشیایی که برند را لمس‌پذیر می‌کنند.'],
+    ['اجرای فضا', 'غرفه و نمایشگاه — همان هویت، در مقیاس بدن.'],
+  ]
+  const s9 = slide({
+    id: 'nm-services', background: CHAR, transition: 'fade',
+    notes: 'خدمات در سه ستون؛ سه نقطهٔ رنگی پایین — همین نقاط در اسلاید تماس به ردیف امضا morph می‌شوند.',
+    elements: [
+      kick('کاری که می‌کنیم'),
+      ...servs.flatMap(([t, d], i) => [
+        ftext({ x: 96 + i * 376, y: 200, w: 336, h: 44, html: t, fontSize: 28, fontWeight: 800, color: BONE, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 96 + i * 376, y: 256, w: 336, h: 90, html: d, fontSize: 17, color: SOFT, lineHeight: 1.7, fx: { enter: 'fade-up', order: i } }),
+        shape('rect', { x: 96 + i * 376, y: 176, w: 60, h: 3, fill: [CLAY, GRAPH, PERS][i] }),
+      ]),
+      ...['nm-a', 'nm-b', 'nm-c'].map((bid, i) => shape('ellipse', { id: bid, x: 620 + i * 20, y: 620, w: 12, h: 12, fill: [CLAY, GRAPH, PERS][i] })),
+      shape('rect', { x: 96, y: 560, w: 1088, h: 1, fill: 'rgba(239,236,228,0.16)' }),
+      ftext({ x: 486, y: 586, w: 698, h: 28, html: 'از ایده تا اجرا — یک تیم، از ۱۳۹۸ تا امروز', fontSize: 16, color: SOFT }),
+      pg(9, true),
+    ],
+  })
+
+  const s10 = slide({
+    id: 'nm-contact', background: BONE, transition: 'morph',
+    notes: 'بیت morph هشتم: سه نقطه به ردیف نشان‌های فصل زیر تیتر تماس می‌آیند — امضای پایانی. ایمیل و نشانی را عوض کنید.',
+    elements: [
+      ftext({ x: 96, y: 180, w: 1088, h: 140, html: 'با ما حرف بزنید.', fontSize: 96, fontWeight: 800, color: '#191817', align: 'center' }),
+      ...['nm-a', 'nm-b', 'nm-c'].map((bid, i) => shape('rect', { id: bid, x: 596 + i * 34, y: 350, w: 22, h: 22, radius: 6, fill: [CLAY, GRAPH, PERS][i] })),
+      ftext({ x: 296, y: 440, w: 688, h: 40, html: 'hello@namayesh.example · خیابان کریم‌خان، تهران', fontSize: 21, fontWeight: 600, color: INKS, align: 'center' }),
+      ftext({ x: 296, y: 640, w: 688, h: 24, html: 'استودیو نمایش — برندی فرضی برای یک قالب واقعی', fontSize: 12, color: 'rgba(25,24,23,0.45)', align: 'center' }),
+      pg(10),
+    ],
+  })
+
+  return doc({
+    title: 'نمایش — قالب نمونه‌کار', withFonts: ['Vazirmatn'],
+    assets: {
+      'ph-obj1': photo('terra-v1.jpg'), 'ph-obj2': photo('terra-v2.jpg'), 'ph-obj3': photo('terra-v3.jpg'),
+      'ph-print1': photo('signal-press.jpg'), 'ph-print2': photo('signal-press2.jpg'),
+      'ph-spc1': photo('picnic-fair.jpg'),
+    },
+    theme: { background: CHAR, color: BONE, accent: PERS, fontFamily: VZ },
+    slides: [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10],
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DECK I · «جرقه» — لانچ محصول (product launch, Farsi/RTL)
+// Near-black with neon lime. The DEVICE mockup (pure shapes, no image) is the
+// morph cast: it grows at the reveal, docks left for features, and its UI rows
+// rearrange inside the moving frame. One clickable state demos the stateOf
+// pattern. All copy RTL.
+// ═══════════════════════════════════════════════════════════════════════
+function deckJaraghe() {
+  const VOID = '#070A08', PANEL = '#0E1611', NEON = '#B8FF3C', CY = '#37F0C2'
+  const DIM = 'rgba(178,210,190,0.62)', SCREEN = '#0B120D'
+  const GRAD_NEON = grad(160, [0, 'rgba(184,255,60,0.2)'], [1, 'rgba(55,240,194,0.06)'])
+  const glow = (c, blur = 50) => ({ blur, color: c })
+  const kick = (s, color = NEON) => ftext({ x: 384, y: 84, w: 800, h: 26, html: s, fontSize: 15, fontWeight: 700, color })
+  const pg = (n) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: 'rgba(178,210,190,0.4)', align: 'left', fontFamily: VZ })
+  // the device: frame + screen + three UI rows (rows carry ids — they morph
+  // inside the frame as the device travels)
+  const device = (x, y, w, h) => [
+    shape('rect', { id: 'jr-device', x, y, w, h, radius: 28, fill: PANEL, stroke: 'rgba(184,255,60,0.35)', strokeWidth: 1.5, shadow: glow('rgba(184,255,60,0.22)', 70) }),
+    shape('rect', { id: 'jr-screen', x: x + 16, y: y + 34, w: w - 32, h: h - 68, radius: 16, fill: SCREEN, fillGradient: GRAD_NEON }),
+    shape('rect', { x: x + w / 2 - 30, y: y + 12, w: 60, h: 8, radius: 4, fill: 'rgba(178,210,190,0.3)' }),
+    shape('rect', { id: 'jr-ui1', x: x + 40, y: y + 70, w: w - 110, h: 14, radius: 7, fill: NEON, opacity: 0.85 }),
+    shape('rect', { id: 'jr-ui2', x: x + 40, y: y + 110, w: (w - 110) * 0.6, h: 14, radius: 7, fill: CY, opacity: 0.7 }),
+    shape('rect', { id: 'jr-ui3', x: x + 40, y: y + h - 90, w: w - 80, h: 54, radius: 12, fill: 'rgba(184,255,60,0.12)', stroke: 'rgba(184,255,60,0.4)', strokeWidth: 1 }),
+  ]
+
+  const s1 = slide({
+    id: 'jr-cover', background: VOID, transition: 'none',
+    notes: 'قالب — «جرقه»، لانچ محصول. قاب دستگاه کاملاً با شکل کشیده شده (بدون عکس) و «کستِ» morph است: در معرفی بزرگ می‌شود، برای ویژگی‌ها به چپ می‌رسد و ردیف‌های UI داخلش جابه‌جا می‌شوند. اسلاید state نمونهٔ stateOf است.',
+    elements: [
+      ...device(130, 150, 340, 470),
+      kick('رویداد معرفی محصول'),
+      ftext({ id: 'jr-title', x: 556, y: 180, w: 628, h: 150, html: 'جرقه', fontSize: 130, fontWeight: 800, color: '#F2FFE8', lineHeight: 1.1, shadow: glow('rgba(184,255,60,0.25)', 50) }),
+      ftext({ x: 556, y: 350, w: 628, h: 40, html: 'یادداشت‌هایی که خودشان فکر می‌کنند.', fontSize: 24, color: DIM, fx: { enter: 'fade-up', order: 1 } }),
+      ftext({ x: 556, y: 560, w: 628, h: 26, html: 'نسخهٔ دوم — امسال برای همهٔ پلتفرم‌ها', fontSize: 15, color: 'rgba(178,210,190,0.45)' }),
+      pg(1),
+    ],
+  })
+
+  const pains = [
+    ['یادداشت می‌نویسید', 'و هیچ‌وقت دوباره‌اش نمی‌خوانید.'],
+    ['جست‌وجو کنید', 'و در انبوه متن، خودِ پیام گم شود.'],
+    ['برنامه بریزید', 'و یادداشت‌ها هیچ‌کدام را به یاد نیاورند.'],
+  ]
+  const s2 = slide({
+    id: 'jr-problem', background: VOID, transition: 'fade',
+    notes: 'سه درد، ساده و بی‌نمودار — لانچ با تایپ نفس می‌کشد.',
+    elements: [
+      shape('ellipse', { x: -60, y: 420, w: 360, h: 360, opacity: 0.5, fill: 'rgba(184,255,60,0.07)', shadow: glow('rgba(184,255,60,0.2)', 90) }),
+      kick('مشکل'),
+      ...pains.flatMap(([t, d], i) => [
+        shape('ellipse', { x: 1148, y: 234 + i * 130, w: 12, h: 12, fill: NEON, shadow: glow('rgba(184,255,60,0.8)', 14), fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 556, y: 210 + i * 130, w: 560, h: 44, html: t, fontSize: 30, fontWeight: 800, color: '#F2FFE8', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 556, y: 262 + i * 130, w: 560, h: 36, html: d, fontSize: 19, color: DIM, fx: { enter: 'fade-up', order: i } }),
+      ]),
+      pg(2),
+    ],
+  })
+
+  const s3 = slide({
+    id: 'jr-reveal', background: VOID, transition: 'morph',
+    notes: 'بیت morph اول: دستگاه از گوشهٔ کاور به مرکز می‌آید و بزرگ می‌شود؛ عنوان «جرقه» به راست می‌نشیند.',
+    elements: [
+      ...device(460, 110, 360, 510),
+      kick('معرفی'),
+      ftext({ id: 'jr-title', x: 556, y: 190, w: 628, h: 130, html: 'جرقهٔ ۲', fontSize: 96, fontWeight: 800, color: '#F2FFE8', lineHeight: 1.15, shadow: glow('rgba(184,255,60,0.25)', 50) }),
+      ftext({ x: 848, y: 330, w: 336, h: 150, html: 'همان سادگی، با مغزی تازه: خلاصه‌سازی، پیوند و پیشنهادِ روز.', fontSize: 20, color: DIM, lineHeight: 1.7, fx: { enter: 'fade-up', order: 1 } }),
+      pg(3),
+    ],
+  })
+
+  const feats = [
+    ['خلاصهٔ هوشمند', 'هر یادداشت، سه خطِ قابل فهم.', null],
+    ['هشدار پیش‌دست', 'قرارداد، قبل از موعد به یادتان می‌آید.', 'jr-state-alert'],
+    ['پیوند دانش', 'یادداشت‌های مرتبط، خودشان هم‌نشین می‌شوند.', null],
+  ]
+  const s4 = slide({
+    id: 'jr-features', background: VOID, transition: 'morph',
+    notes: 'بیت morph دوم: دستگاه به لبهٔ چپ می‌رسد و ردیف‌های UI داخل قابِ درحال‌حرکت بازآرایی می‌شوند (سه id مشترک). ویژگیِ میانی کلیک‌پذیر است — به اسلاید state وصل است.',
+    elements: [
+      ...device(96, 200, 290, 400),
+      kick('ویژگی‌ها'),
+      ...feats.flatMap(([t, d, link], i) => [
+        ftext({ x: 556, y: 170 + i * 140, w: 628, h: 44, html: t, fontSize: 28, fontWeight: 800, color: '#F2FFE8', ...(link ? { link } : {}), fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 556, y: 220 + i * 140, w: 628, h: 36, html: d, fontSize: 18, color: DIM, ...(link ? { link } : {}), fx: { enter: 'fade-up', order: i } }),
+        shape('ellipse', { x: 1200, y: 184 + i * 140, w: 12, h: 12, fill: NEON, ...(link ? { link } : {}), shadow: glow('rgba(184,255,60,0.8)', 14) }),
+        ...(link ? [ftext({ x: 556, y: 260 + i * 140, w: 628, h: 26, html: '← برای دیدن نمونه، کلیک کنید', fontSize: 13, color: NEON, link })] : []),
+      ]),
+      pg(4),
+    ],
+  })
+
+  const st = slide({
+    id: 'jr-state-alert', stateOf: 'jr-features', name: 'هشدار پیش‌دست', background: PANEL, transition: 'morph',
+    notes: 'اسلاید state — فقط با کلیک روی «هشدار پیش‌دست» باز می‌شود؛ با فلش چپ به اسلاید ویژگی‌ها برمی‌گردید. قالبش را کپی کنید تا state های خودتان را بسازید.',
+    elements: [
+      kick('نمونهٔ زنده — هشدار پیش‌دست', CY),
+      shape('rect', { id: 'jr-alert', x: 440, y: 200, w: 400, h: 260, radius: 18, fill: SCREEN, stroke: 'rgba(55,240,194,0.5)', strokeWidth: 1.5, shadow: glow('rgba(55,240,194,0.3)', 60) }),
+      shape('ellipse', { x: 476, y: 232, w: 12, h: 12, fill: NEON, shadow: glow('rgba(184,255,60,0.9)', 14) }),
+      ftext({ x: 500, y: 224, w: 310, h: 28, html: 'یادآور جرقه', fontSize: 15, fontWeight: 700, color: NEON }),
+      ftext({ x: 476, y: 280, w: 328, h: 76, html: 'قرارداد «آذرخش» تا سه روز دیگر تمام می‌شود.', fontSize: 20, fontWeight: 700, color: '#F2FFE8', lineHeight: 1.6 }),
+      shape('rect', { x: 476, y: 380, w: 130, h: 40, radius: 20, fill: NEON }),
+      ftext({ x: 476, y: 390, w: 130, h: 26, html: 'تمدید کن', fontSize: 15, fontWeight: 700, color: '#0B120D', align: 'center' }),
+      ftext({ x: 620, y: 390, w: 184, h: 26, html: 'امروز نه', fontSize: 15, color: DIM }),
+      ftext({ x: 96, y: 560, w: 1088, h: 30, html: 'برای برگشت کلیک کنید یا فلش چپ بزنید', fontSize: 14, color: 'rgba(178,210,190,0.5)', align: 'center' }),
+      shape('rect', { x: 0, y: 0, w: 1280, h: 720, fill: 'rgba(0,0,0,0)', link: 'jr-features' }),
+    ],
+  })
+
+  const stats = [
+    ['۳ برابر', 'سریع‌تر از نسخهٔ ۱'],
+    ['۹۸٪', 'دقت خلاصه‌سازی در آزمون تیم'],
+    ['۴۰ هزار', 'عضو لیست انتظار'],
+  ]
+  const s5 = slide({
+    id: 'jr-stats', background: VOID, transition: 'fade',
+    notes: 'اعداد لانچ — درشت، بدون نمودار؛ اعداد شاهد جای روایت را می‌گیرند.',
+    elements: [
+      kick('اعداد'),
+      ...stats.flatMap(([n, d], i) => [
+        ftext({ x: 96 + (2 - i) * 376, y: 250, w: 336, h: 90, html: n, fontSize: 66, fontWeight: 800, color: NEON, align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 96 + (2 - i) * 376, y: 360, w: 336, h: 40, html: d, fontSize: 17, color: DIM, align: 'center', fx: { enter: 'fade-up', order: i } }),
+      ]),
+      shape('rect', { x: 490, y: 480, w: 300, h: 2, fill: 'rgba(184,255,60,0.4)' }),
+      ftext({ x: 240, y: 520, w: 800, h: 36, html: '«به‌روزرسانی جرقه، شاید بهترین کاری باشد که امسال برای ذهنتان کنید.»', fontSize: 19, color: DIM, align: 'center' }),
+      pg(5),
+    ],
+  })
+
+  const s6 = slide({
+    id: 'jr-pricing', background: VOID, transition: 'zoom',
+    notes: 'قیمت‌گذاری تک‌کارت — لانچ‌ها ساده می‌فروشند: یک قیمت، یک CTA.',
+    elements: [
+      shape('rect', { x: 440, y: 170, w: 400, h: 380, radius: 24, fill: PANEL, stroke: 'rgba(184,255,60,0.5)', strokeWidth: 1.5, shadow: glow('rgba(184,255,60,0.3)', 70) }),
+      ftext({ x: 440, y: 210, w: 400, h: 36, html: 'جرقهٔ ۲ — پیش‌ثبت‌نام', fontSize: 18, fontWeight: 700, color: NEON, align: 'center' }),
+      ftext({ x: 440, y: 270, w: 400, h: 90, html: '۹۹ هزار تومان', fontSize: 56, fontWeight: 800, color: '#F2FFE8', align: 'center' }),
+      ftext({ x: 440, y: 366, w: 400, h: 32, html: 'در ماه — همهٔ پلتفرم‌ها', fontSize: 16, color: DIM, align: 'center' }),
+      shape('rect', { x: 530, y: 440, w: 220, h: 52, radius: 26, fill: NEON, shadow: glow('rgba(184,255,60,0.5)', 30) }),
+      ftext({ x: 530, y: 454, w: 220, h: 30, html: 'رزرو کنید', fontSize: 18, fontWeight: 800, color: '#0B120D', align: 'center' }),
+      ftext({ x: 440, y: 590, w: 400, h: 28, html: 'لغو در هر زمان · ۱۴ روز بازگشت', fontSize: 13, color: 'rgba(178,210,190,0.5)', align: 'center' }),
+      pg(6),
+    ],
+  })
+
+  const s7 = slide({
+    id: 'jr-cta', background: VOID, transition: 'morph',
+    notes: 'بستن: دستگاه کوچک به مرکز برمی‌گردد و CTA زیرش می‌نشیند.',
+    elements: [
+      ...device(560, 130, 280, 380),
+      ftext({ x: 96, y: 560, w: 1088, h: 60, html: 'جرقه را روشن کنید.', fontSize: 44, fontWeight: 800, color: '#F2FFE8', align: 'center' }),
+      ftext({ x: 296, y: 636, w: 688, h: 26, html: 'jaraghe.example — محصولی فرضی برای یک قالب واقعی', fontSize: 12, color: 'rgba(178,210,190,0.45)', align: 'center' }),
+      pg(7),
+    ],
+  })
+
+  return doc({
+    title: 'جرقه — قالب لانچ محصول', withFonts: ['Vazirmatn'],
+    theme: { background: VOID, color: '#F2FFE8', accent: NEON, fontFamily: VZ },
+    present: { progress: true },
+    slides: [s1, s2, s3, s4, st, s5, s6, s7],
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DECK J · «همایش» — رویداد و کنفرانس (event/conference, Farsi/RTL)
+// Grape poster ground with coral and sun. Three sticker shapes are the cast:
+// cover confetti → topic cards → they return for the close. The agenda's
+// coral highlight bar is its own morph — it slides down between day 1 and 2.
+// ═══════════════════════════════════════════════════════════════════════
+function deckHamayesh() {
+  const GRAPE = '#31215A', LILAC = '#EDE8F9', CORAL = '#FF6B4A', SUN = '#FFC93C'
+  const INKV = '#241746', SOFT = 'rgba(36,23,70,0.62)', LILAC_DIM = 'rgba(237,232,249,0.65)'
+  const kick = (s, color = CORAL) => ftext({ x: 384, y: 84, w: 800, h: 26, html: s, fontSize: 15, fontWeight: 700, color })
+  const pg = (n, dark) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: dark ? LILAC_DIM : SOFT, align: 'left', fontFamily: VZ })
+
+  const s1 = slide({
+    id: 'hm-cover', background: GRAPE, transition: 'none',
+    notes: 'قالب — «همایش»، رویداد و کنفرانس. پوستر: تاریخ درشت سمت راست، سه شکل برچسبی چپ (کستِ morph)، خط مکان پایین. اشکال در اسلاید محورها به کارت تبدیل می‌شوند و در پایان برمی‌گردند.',
+    elements: [
+      shape('triangle', { id: 'hm-a', x: 120, y: 120, w: 190, h: 170, rotation: 8, fill: SUN }),
+      shape('ellipse', { id: 'hm-b', x: 330, y: 330, w: 140, h: 140, rotation: -6, fill: CORAL }),
+      shape('rect', { id: 'hm-c', x: 140, y: 470, w: 150, h: 150, radius: 34, rotation: -8, fill: LILAC }),
+      ftext({ x: 596, y: 110, w: 588, h: 130, html: '۱۲–۱۴ آبان', fontSize: 92, fontWeight: 800, color: SUN, lineHeight: 1.15 }),
+      ftext({ x: 596, y: 260, w: 588, h: 172, html: 'همایش<br>طراحی تهران', fontSize: 64, fontWeight: 800, color: LILAC, lineHeight: 1.3 }),
+      ftext({ x: 596, y: 440, w: 588, h: 36, html: 'سه روز، سه سالن، چهل سخنران.', fontSize: 20, color: LILAC_DIM, fx: { enter: 'fade-up', order: 1 } }),
+      shape('rect', { x: 596, y: 560, w: 588, h: 2, fill: 'rgba(237,232,249,0.25)' }),
+      ftext({ x: 596, y: 580, w: 588, h: 28, html: 'مرکز همایش‌های یادمان · ثبت‌نام از اول مهر', fontSize: 15, color: LILAC_DIM }),
+      pg(1, true),
+    ],
+  })
+
+  const topics = [
+    ['تایپ و حروف', 'از خوشنویسی تا فونت متغیر — روزی دربارهٔ حروف فارسی.', SUN],
+    ['هوش و طراحی', 'ابزارهای مولد، وقتی که طراح فرمان را رها نمی‌کند.', CORAL],
+    ['طراحی فارسی', 'چالش‌های راست‌به‌چپ؛ شبکه، اعداد و نیم‌فاصله.', LILAC],
+  ]
+  const s2 = slide({
+    id: 'hm-topics', background: LILAC, transition: 'morph',
+    notes: 'بیت morph اول: سه برچسب پوستر به سه کارت محور تبدیل می‌شوند — چرخش صفر، رنگ می‌ماند، متن سواپ می‌شود.',
+    elements: [
+      kick('محورهای امسال'),
+      ...topics.flatMap(([t, d, c], i) => {
+        const cx = 96 + (2 - i) * 376
+        return [
+        shape('rect', { id: ['hm-a', 'hm-b', 'hm-c'][i], x: cx, y: 220, w: 336, h: 300, radius: 22, fill: c, shadow: { y: 12, blur: 34, color: 'rgba(36,23,70,0.18)' } }),
+        ftext({ x: cx + 24, y: 260, w: 288, h: 52, html: t, fontSize: 30, fontWeight: 800, color: INKV }),
+        ftext({ x: cx + 24, y: 330, w: 288, h: 110, html: d, fontSize: 17, color: 'rgba(36,23,70,0.78)', lineHeight: 1.7 }),
+        ]
+      }),
+      ftext({ x: 96, y: 580, w: 1088, h: 30, html: 'هر محور، یک سالن و یک روز کامل — برنامهٔ دقیق در اسلایدهای بعد.', fontSize: 17, color: SOFT, align: 'center' }),
+      pg(2),
+    ],
+  })
+
+  const day1 = [
+    ['۰۹:۰۰', 'پذیرش و قهوه'],
+    ['۱۰:۰۰', 'گشایش — حروف، قبل از صفحه‌کلید'],
+    ['۱۳:۰۰', 'ناهار و میزگرد استودیوها'],
+    ['۱۶:۰۰', 'پنل: آیندهٔ فونت فارسی'],
+  ]
+  const s3 = slide({
+    id: 'hm-day1', background: LILAC, transition: 'fade',
+    notes: 'آجندای روز اول — نوار مرجانی پشت نخستین آیتم؛ همین نوار در روز دوم پایین می‌سرد (morph).',
+    elements: [
+      kick('برنامه — روز اول'),
+      shape('rect', { id: 'hm-bar', x: 96, y: 176, w: 1088, h: 84, radius: 16, fill: CORAL, opacity: 0.18 }),
+      shape('rect', { x: 1168, y: 176, w: 16, h: 84, radius: 8, fill: CORAL }),
+      ...day1.flatMap(([t, what], i) => [
+        ftext({ x: 556, y: 192 + i * 110, w: 590, h: 52, html: what, fontSize: 26, fontWeight: i === 0 ? 800 : 600, color: INKV }),
+        text({ x: 96, y: 200 + i * 110, w: 400, h: 36, html: t, fontSize: 20, fontWeight: 700, color: CORAL, align: 'left', fontFamily: VZ }),
+      ]),
+      pg(3),
+    ],
+  })
+
+  const day2 = [
+    ['۰۹:۳۰', 'کارگاه: شبکه در راست‌به‌چپ'],
+    ['۱۲:۰۰', 'سخنرانی اصلی — طراحی برای ۸۵ میلیون نفر'],
+    ['۱۵:۰۰', 'پنل: قیمت‌گذاری طراحی در ایران'],
+    ['۱۸:۰۰', 'پایان‌بندی و ضیافت'],
+  ]
+  const s4 = slide({
+    id: 'hm-day2', background: LILAC, transition: 'morph',
+    notes: 'بیت morph دوم: نوار مرجانی از آیتم اول روز اول به آیتم دوم روز دوم می‌سُرد — جهتِ خواندنِ نوار، همان جهت متن است.',
+    elements: [
+      kick('برنامه — روز دوم'),
+      ...day2.flatMap(([t, what], i) => [
+        ...(i === 1 ? [
+          shape('rect', { id: 'hm-bar', x: 96, y: 286, w: 1088, h: 84, radius: 16, fill: CORAL, opacity: 0.18 }),
+          shape('rect', { x: 1168, y: 286, w: 16, h: 84, radius: 8, fill: CORAL }),
+        ] : []),
+        ftext({ x: 556, y: 192 + i * 110, w: 590, h: 52, html: what, fontSize: 26, fontWeight: i === 1 ? 800 : 600, color: INKV }),
+        text({ x: 96, y: 200 + i * 110, w: 400, h: 36, html: t, fontSize: 20, fontWeight: 700, color: CORAL, align: 'left', fontFamily: VZ }),
+      ]),
+      pg(4),
+    ],
+  })
+
+  const speakers = [
+    ['ر', 'رها نیک‌آیین', 'طراح حروف — استودیو قلم'],
+    ['ب', 'بهرام صدر', 'مدیر طراحی — دیجی‌مدیا (فرضی)'],
+    ['م', 'مینا کاشانی', 'پژوهشگر طراحی ایرانی'],
+    ['ا', 'امید فرهادی', 'طراح تجربه — استودیو نمایش'],
+  ]
+  const s5 = slide({
+    id: 'hm-speakers', background: GRAPE, transition: 'fade',
+    notes: 'چهار سخنران با سرفصل حرفِ نام — قالب بدون عکس پرتره تحویل می‌شود؛ اگر عکس داشتید img جای دایره بنشینید.',
+    elements: [
+      kick('سخنران‌ها', SUN),
+      ...speakers.flatMap(([ltr, name, role], i) => {
+        const cx = 96 + (3 - i) * 278
+        return [
+        shape('ellipse', { x: cx + 59, y: 190, w: 136, h: 136, fill: [CORAL, SUN, LILAC, '#8A6FE8'][i], shadow: { y: 8, blur: 26, color: 'rgba(0,0,0,0.3)' }, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 59, y: 228, w: 136, h: 64, html: ltr, fontSize: 48, fontWeight: 800, color: i === 2 ? INKV : '#241746', align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx, y: 352, w: 254, h: 40, html: name, fontSize: 21, fontWeight: 700, color: LILAC, align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx, y: 396, w: 254, h: 44, html: role, fontSize: 14, color: LILAC_DIM, align: 'center', lineHeight: 1.5, fx: { enter: 'fade-up', order: i } }),
+        ]
+      }),
+      ftext({ x: 96, y: 540, w: 1088, h: 30, html: 'و ۳۶ سخنران دیگر — در سه سالن، هم‌زمان.', fontSize: 17, color: LILAC_DIM, align: 'center' }),
+      pg(5, true),
+    ],
+  })
+
+  const shops = [
+    ['شبکهٔ فارسی در عمل', '۶ ساعت · ۲۰ نفر', SUN],
+    ['فونت متغیر بسازید', '۴ ساعت · ۱۶ نفر', CORAL],
+    ['پروتوتایپ با کد', '۵ ساعت · ۲۴ نفر', '#8A6FE8'],
+  ]
+  const s6 = slide({
+    id: 'hm-workshops', background: LILAC, transition: 'fade',
+    notes: 'کارگاه‌ها — ظرفیت محدود؛ بج ظرفیت روی هر کارت.',
+    elements: [
+      kick('کارگاه‌ها — روز دوم'),
+      ...shops.flatMap(([t, cap, c], i) => {
+        const cx = 96 + (2 - i) * 376
+        return [
+        shape('rect', { x: cx, y: 200, w: 336, h: 280, radius: 20, fill: '#FFFDF8', stroke: 'rgba(36,23,70,0.12)', strokeWidth: 1, shadow: { y: 10, blur: 28, color: 'rgba(36,23,70,0.1)' }, fx: { enter: 'fade-up', order: i } }),
+        shape('rect', { x: cx + 258, y: 228, w: 54, h: 54, radius: 14, fill: c }),
+        ftext({ x: cx + 24, y: 316, w: 288, h: 76, html: t, fontSize: 24, fontWeight: 800, color: INKV, lineHeight: 1.4 }),
+        shape('rect', { x: cx + 162, y: 416, w: 150, h: 36, radius: 18, fill: 'rgba(36,23,70,0.08)' }),
+        ftext({ x: cx + 162, y: 424, w: 150, h: 24, html: cap, fontSize: 13, fontWeight: 700, color: SOFT, align: 'center' }),
+        ]
+      }),
+      pg(6),
+    ],
+  })
+
+  const s7 = slide({
+    id: 'hm-venue', background: SUN, transition: 'zoom',
+    notes: 'مکان — پوستر زرد با نقشهٔ انتزاعی (دو مسیر و یک نقطه). نشانی و مترو را عوض کنید.',
+    elements: [
+      shape('rect', { x: 96, y: 150, w: 500, h: 420, radius: 24, fill: '#FFE58A' }),
+      shape('line', { x: 130, y: 300, w: 430, h: 3, fill: '#241746', strokeWidth: 3, strokeStyle: 'dashed' }),
+      shape('line', { x: 340, y: 180, w: 3, h: 360, fill: '#241746', strokeWidth: 3, strokeStyle: 'dashed' }),
+      shape('ellipse', { x: 296, y: 256, w: 34, h: 34, fill: CORAL, stroke: INKV, strokeWidth: 3 }),
+      ftext({ x: 130, y: 480, w: 430, h: 30, html: 'مترو: ایستگاه یادمان — خروجی ۲', fontSize: 15, fontWeight: 700, color: 'rgba(36,23,70,0.7)', align: 'center' }),
+      ftext({ x: 656, y: 200, w: 528, h: 160, html: 'مرکز همایش‌های<br>یادمان', fontSize: 60, fontWeight: 800, color: INKV, lineHeight: 1.25 }),
+      ftext({ x: 656, y: 380, w: 528, h: 36, html: 'بلوار دانش، پلاک ۱۲ — تهران', fontSize: 20, color: 'rgba(36,23,70,0.72)' }),
+      shape('rect', { x: 656, y: 430, w: 200, h: 56, radius: 28, fill: INKV }),
+      ftext({ x: 656, y: 446, w: 200, h: 30, html: 'مسیر روی نقشه', fontSize: 16, fontWeight: 700, color: SUN, align: 'center' }),
+      pg(7),
+    ],
+  })
+
+  const tickets = [
+    ['دانشجویی', '۹۸۰ هزار تومان', 'با کارت معتبر'],
+    ['عادی', '۲ میلیون و ۴۰۰', 'دسترسی کامل سه روز'],
+    ['ویژه', '۴ میلیون و ۹۰۰', 'همهٔ کارگاه‌ها + ضیافت'],
+  ]
+  const s8 = slide({
+    id: 'hm-tickets', background: GRAPE, transition: 'fade',
+    notes: 'بلیط — سه پلن؛ کارت میانی توصیه‌شده. بج‌های برچسبی کوچک هم‌قاعدهٔ کاور (چرخش ملایم) — و کستِ morph روی همین کارت‌ها می‌ماند تا اسلاید بعد.',
+    elements: [
+      kick('بلیط', SUN),
+      ...tickets.flatMap(([t, p, d], i) => {
+        const cx = 96 + (2 - i) * 376
+        return [
+        shape('rect', { x: cx, y: 200, w: 336, h: 300, radius: 20, fill: i === 1 ? CORAL : 'rgba(237,232,249,0.08)', stroke: 'rgba(237,232,249,0.25)', strokeWidth: 1, ...(i === 1 ? { shadow: { y: 14, blur: 40, color: 'rgba(255,107,74,0.35)' } } : {}) }),
+        ftext({ x: cx + 24, y: 230, w: 288, h: 40, html: t, fontSize: 22, fontWeight: 700, color: i === 1 ? '#FFF' : LILAC }),
+        ftext({ x: cx + 24, y: 290, w: 288, h: 70, html: p, fontSize: 30, fontWeight: 800, color: i === 1 ? '#FFF' : SUN, lineHeight: 1.35 }),
+        ftext({ x: cx + 24, y: 380, w: 288, h: 32, html: d, fontSize: 15, color: i === 1 ? 'rgba(255,255,255,0.8)' : LILAC_DIM }),
+        shape('rect', { id: ['hm-a', 'hm-b', 'hm-c'][i], x: cx + 292, y: 460, w: 20, h: 20, rotation: 0, fill: [SUN, CORAL, LILAC][i] }),
+        ]
+      }),
+      pg(8, true),
+    ],
+  })
+
+  const s9 = slide({
+    id: 'hm-close', background: CORAL, transition: 'morph',
+    notes: 'بیت morph سوم: برچسب‌ها به بالای تیتر پایانی برمی‌گردند (چرخ‌وفلک رنگ‌ها). CTA ثبت‌نام.',
+    elements: [
+      shape('triangle', { id: 'hm-a', x: 556, y: 130, w: 54, h: 48, rotation: 8, fill: SUN }),
+      shape('ellipse', { id: 'hm-b', x: 640, y: 140, w: 44, h: 44, rotation: -6, fill: '#8A6FE8' }),
+      shape('rect', { id: 'hm-c', x: 716, y: 138, w: 42, h: 42, radius: 12, rotation: -8, fill: LILAC }),
+      ftext({ x: 96, y: 250, w: 1088, h: 135, html: 'می‌بینیمتان، آبان.', fontSize: 96, fontWeight: 800, color: '#FFF', align: 'center' }),
+      shape('rect', { x: 512, y: 430, w: 256, h: 60, radius: 30, fill: '#FFF' }),
+      ftext({ x: 512, y: 448, w: 256, h: 32, html: 'hamayesh.example — ثبت‌نام', fontSize: 18, fontWeight: 800, color: CORAL, align: 'center' }),
+      ftext({ x: 296, y: 640, w: 688, h: 24, html: 'همایش طراحی تهران — رویدادی فرضی برای یک قالب واقعی', fontSize: 12, color: 'rgba(255,255,255,0.65)', align: 'center' }),
+      pg(9),
+    ],
+  })
+
+  return doc({
+    title: 'همایش — قالب رویداد و کنفرانس', withFonts: ['Vazirmatn'],
+    theme: { background: GRAPE, color: LILAC, accent: CORAL, fontFamily: VZ },
+    present: { progress: true },
+    slides: [s1, s2, s3, s4, s5, s6, s7, s8, s9],
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DECK K · «نبض» — گزارش داده (data/analytics quarterly, Farsi/RTL)
+// Cool fog ground, one slate dark interlude. The four KPI cards are the
+// cast: cover dots → KPI row → they FLATTEN into the conversion funnel
+// (bars shrinking, right-anchored like the reading direction) → closing row.
+// ═══════════════════════════════════════════════════════════════════════
+function deckNabz() {
+  const FOG = '#EDF0F5', SLATE = '#1B2430', CARD = '#FFFFFF'
+  const BLUE = '#2E6BE6', TEAL = '#12A594', AMBER = '#EFA022', ROSE = '#E5484D'
+  const INKT = '#1B2430', SOFT = 'rgba(27,36,48,0.58)'
+  const kick = (s, color = BLUE) => ftext({ x: 384, y: 84, w: 800, h: 26, html: s, fontSize: 15, fontWeight: 700, color })
+  const pg = (n, dark) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: dark ? 'rgba(200,215,235,0.5)' : SOFT, align: 'left', fontFamily: VZ })
+  const cast = ['nb-a', 'nb-b', 'nb-c', 'nb-d']
+  const castColors = [BLUE, TEAL, AMBER, ROSE]
+
+  const s1 = slide({
+    id: 'nb-cover', background: FOG, transition: 'none',
+    notes: 'قالب — «نبض»، گزارش داده فصلی. چهار نقطهٔ رنگی کاور، همان چهار کارت KPI می‌شوند و بعد به قیف تبدیل flattening می‌شوند —morph روایتِ اعداد.',
+    elements: [
+      kick('نبض — پایش محصول دیجیتال'),
+      ftext({ x: 96, y: 170, w: 1088, h: 130, html: 'تابستان در یک نگاه', fontSize: 88, fontWeight: 800, color: INKT }),
+      ftext({ x: 336, y: 330, w: 848, h: 44, html: 'گزارش دادهٔ فصل تابستان ۱۴۰۵ — تیم رشد', fontSize: 22, color: SOFT, fx: { enter: 'fade-up', order: 1 } }),
+      ...cast.map((c, i) => shape('ellipse', { id: c, x: 96 + i * 34, y: 560, w: 22, h: 22, fill: castColors[i] })),
+      ftext({ x: 250, y: 562, w: 500, h: 24, html: 'چهار سنجه، یک فصل', fontSize: 14, color: SOFT }),
+      pg(1),
+    ],
+  })
+
+  const kpis = [
+    ['۸۴٬۲۰۰', 'کاربر فعال ماهانه', '+۹٪ نسبت به بهار', castColors[0]],
+    ['۳٫۴٪', 'نرخ تبدیل بازدید', '+۰٫۳ واحد', castColors[1]],
+    ['۱۲٫۸ میلیارد', 'تومان درآمد فصل', '+۱۴٪ رشد', castColors[2]],
+    ['۲٫۱٪', 'نرخ ریزش ماهانه', '−۰٫۴ بهبود', castColors[3]],
+  ]
+  const s2 = slide({
+    id: 'nb-kpi', background: FOG, transition: 'morph',
+    notes: 'بیت morph اول: نقاط به کارت‌های KPI تبدیل می‌شوند. دلتای ریزش «بهبود» است چون جهتش مثبت است — رنگ‌ها معنا دارند، نه علامت.',
+    elements: [
+      kick('نمای کلی فصل'),
+      ...kpis.flatMap(([n, l, d, c], i) => {
+        const cx = 96 + (3 - i) * 278
+        return [
+        shape('rect', { id: cast[i], x: cx, y: 200, w: 254, h: 260, radius: 16, fill: CARD, shadow: { y: 12, blur: 30, color: 'rgba(27,36,48,0.1)' } }),
+        shape('rect', { x: cx + 24, y: 228, w: 40, h: 5, radius: 3, fill: c }),
+        ftext({ x: cx + 24, y: 256, w: 206, h: 70, html: n, fontSize: 40, fontWeight: 800, color: INKT }),
+        ftext({ x: cx + 24, y: 340, w: 206, h: 48, html: l, fontSize: 16, color: SOFT, lineHeight: 1.5 }),
+        ftext({ x: cx + 24, y: 404, w: 206, h: 30, html: d, fontSize: 15, fontWeight: 700, color: TEAL }),
+        ]
+      }),
+      ftext({ x: 96, y: 520, w: 1088, h: 32, html: 'همهٔ سنجه‌های اصلی در مسیر رشد هستند؛ قیف پایین جزئیات می‌گوید.', fontSize: 18, color: SOFT }),
+      pg(2),
+    ],
+  })
+
+  const s3 = slide({
+    id: 'nb-growth', background: FOG, transition: 'fade',
+    notes: 'خط رشد کاربران — رنگ آبی نبض، tooltip فارسی.',
+    elements: [
+      kick('رشد کاربران'),
+      chart({ x: 96, y: 150, w: 1088, h: 470, preset: 'line', option: {
+        grid: { left: 60, right: 20, top: 30, bottom: 36 },
+        xAxis: { type: 'category', data: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور'] },
+        yAxis: { type: 'value' },
+        color: [BLUE],
+        tooltip: { trigger: 'axis', formatter: '{b}: {c} هزار کاربر' },
+        series: [{ type: 'line', smooth: true, data: [52, 56, 61, 68, 76, 84],
+          lineStyle: { width: 3.5, color: BLUE },
+          areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [{ offset: 0, color: 'rgba(46,107,230,0.25)' }, { offset: 1, color: 'rgba(46,107,230,0)' }] } },
+          symbol: 'circle', symbolSize: 8, itemStyle: { color: BLUE } }],
+      }, fx: { enter: 'fade-up' } }),
+      pg(3),
+    ],
+  })
+
+  const s4 = slide({
+    id: 'nb-channels', background: FOG, transition: 'fade',
+    notes: 'دوناتِ کانال‌های جذب + خوانش کوتاه سمت راست. پالت نبض، نه پالت پیش‌فرض چارت.',
+    elements: [
+      kick('کانال‌های جذب'),
+      ftext({ x: 96, y: 130, w: 1088, h: 70, html: 'کاربر تازه از کجا می‌آید.', fontSize: 44, fontWeight: 800, color: INKT }),
+      chart({ x: 96, y: 230, w: 560, h: 420, preset: 'pie', option: {
+        color: [BLUE, TEAL, AMBER, ROSE],
+        tooltip: { trigger: 'item', formatter: '{b}: {d}٪' },
+        series: [{ type: 'pie', radius: ['45%', '72%'],
+          data: [
+            { name: 'جست‌وجو', value: 44 }, { name: 'شبکه‌های اجتماعی', value: 26 },
+            { name: 'معرفی کاربران', value: 18 }, { name: 'تبلیغات', value: 12 },
+          ], label: { show: true } }],
+      }, fx: { enter: 'fade-up' } }),
+      ftext({ x: 720, y: 260, w: 464, h: 160, html: 'جست‌وجوی ارگانیک، همچنان نصف ورودی‌ها؛<br>معرفیِ کاربران این فصل دو برابر شده —<br>محصول در حال حرف‌زدن است.', fontSize: 20, color: SOFT, lineHeight: 1.8, fx: { enter: 'fade-up', order: 2 } }),
+      pg(4),
+    ],
+  })
+
+  const s5 = slide({
+    id: 'nb-hours', background: SLATE, transition: 'fade',
+    notes: 'میان‌پردهٔ تیره: ساعات اوج استفاده. روی تاریکی، رنگ محورها را دستی روشن کنید — پیش‌فرض خاکستری چارت در تاریکی گم می‌شود.',
+    elements: [
+      ftext({ x: 384, y: 84, w: 800, h: 26, html: 'ساعت‌های اوج — تابستان', fontSize: 15, fontWeight: 700, color: AMBER }),
+      ftext({ x: 96, y: 130, w: 1088, h: 70, html: 'شب‌ها مالِ ماست.', fontSize: 44, fontWeight: 800, color: '#EDF0F5' }),
+      chart({ x: 96, y: 230, w: 1088, h: 400, preset: 'bar', option: {
+        grid: { left: 56, right: 16, top: 24, bottom: 32 },
+        xAxis: { type: 'category', data: ['۸ صبح', '۱۲ ظهر', '۱۶', '۲۰', 'نیمه‌شب'],
+          axisLabel: { color: 'rgba(200,215,235,0.75)' } },
+        yAxis: { type: 'value', axisLabel: { color: 'rgba(200,215,235,0.6)' }, splitLine: { lineStyle: { color: 'rgba(200,215,235,0.12)' } } },
+        color: [AMBER],
+        tooltip: { trigger: 'item', formatter: '{b}: {c}٪ فعالیت' },
+        series: [{ type: 'bar', data: [18, 34, 41, 86, 52], itemStyle: { color: AMBER, borderRadius: 6 }, barWidth: 90 }],
+      }, fx: { enter: 'fade-up' } }),
+      pg(5, true),
+    ],
+  })
+
+  const funnel = [
+    ['بازدید', '۲۸۴ هزار', 900, castColors[0]],
+    ['ثبت‌نام', '۱۱۹ هزار — ۴۲٪', 640, castColors[1]],
+    ['فعال‌سازی', '۶۸ هزار — ۲۴٪', 430, castColors[2]],
+    ['خرید', '۲۵ هزار — ۹٪', 260, castColors[3]],
+  ]
+  const s6 = slide({
+    id: 'nb-funnel', background: FOG, transition: 'morph',
+    notes: 'بیت morph دوم — امضای قالب: کارت‌های KPI پخ می‌شوند و به میله‌های قیف تبدیل می‌شوند؛ لبه‌ها راست‌چین‌اند چون متن از راست خوانده می‌شود. عرض میله = نسبت مراحل.',
+    elements: [
+      kick('قیف تبدیل — از بازدید تا خرید'),
+      ...funnel.flatMap(([label, val, w, c], i) => [
+        shape('rect', { id: cast[i], x: 1184 - w, y: 180 + i * 110, w, h: 72, radius: 14, fill: c, opacity: 0.88 }),
+        ftext({ x: 1184 - w + 24, y: 200 + i * 110, w: w - 48, h: 36, html: label, fontSize: 20, fontWeight: 800, color: '#FFF' }),
+        ftext({ x: 96, y: 200 + i * 110, w: 1184 - w - 130, h: 34, html: val, fontSize: 16, color: SOFT }),
+      ]),
+      ftext({ x: 96, y: 610, w: 1088, h: 30, html: 'افت اصلی بین فعال‌سازی و خرید است — تمرکز پاییز همین‌جاست.', fontSize: 18, color: SOFT }),
+      pg(6),
+    ],
+  })
+
+  const s7 = slide({
+    id: 'nb-regions', background: FOG, transition: 'fade',
+    notes: 'جدول مناطق — فونت جدول وزیرمتن، ستون‌ها راست‌چین.',
+    elements: [
+      kick('مناطق'),
+      ftable({
+        x: 96, y: 160, w: 1088, h: 360,
+        columns: [{ w: 1.4 }, { w: 1.2 }, { w: 1.2 }, { w: 1.2 }],
+        rows: [
+          { cells: [fcell('منطقه', { bold: true }), fcell('کاربر فعال', { bold: true }), fcell('درآمد (میلیارد تومان)', { bold: true }), fcell('رشد فصلی', { bold: true })] },
+          { cells: [fcell('تهران'), fcell('۳۱٬۴۰۰'), fcell('۶٫۲'), fcell('+۱۱٪', { color: TEAL, bold: true })] },
+          { cells: [fcell('اصفهان'), fcell('۱۸٬۲۰۰'), fcell('۲٫۸'), fcell('+۹٪', { color: TEAL, bold: true })] },
+          { cells: [fcell('مشهد'), fcell('۱۴٬۹۰۰'), fcell('۲٫۱'), fcell('+۱۲٪', { color: TEAL, bold: true })] },
+          { cells: [fcell('سایر'), fcell('۱۹٬۷۰۰'), fcell('۱٫۷'), fcell('+۴٪', { color: TEAL, bold: true })] },
+        ],
+        headerBg: SLATE, headerColor: '#EDF0F5', zebra: 'rgba(27,36,48,0.04)',
+        borderColor: 'rgba(27,36,48,0.14)', color: INKT,
+      }),
+      ftext({ x: 96, y: 560, w: 1088, h: 30, html: 'رشد از پایتخت شروع شد، اما کندیِ «سایر» تهدید فصل بعد است.', fontSize: 17, color: SOFT }),
+      pg(7),
+    ],
+  })
+
+  const insights = [
+    ['معرفی‌ها داغ‌اند', 'دو برابر شدن دعوت‌های موفق؛ برنامهٔ معرفی را در پاییز وسعت بدهید.'],
+    ['شب، وقت طلایی است', 'اوج فعالیت بعد از ساعت ۲۰ — زمان‌بندی اعلان‌ها را جابه‌جا کنید.'],
+    ['گلوگاه، خرید است', '۹٪ قیف یعنی بزرگ‌ترین اهرم درآمدی، فعال‌سازی تا پرداخت.'],
+  ]
+  const s8 = slide({
+    id: 'nb-insights', background: FOG, transition: 'fade',
+    notes: 'سه بینش — هر کارت یک «پس چه کنیم».',
+    elements: [
+      kick('بینش‌های فصل'),
+      ...insights.flatMap(([t, d], i) => {
+        const cx = 96 + (2 - i) * 376
+        return [
+        shape('rect', { x: cx, y: 190, w: 336, h: 330, radius: 16, fill: CARD, shadow: { y: 10, blur: 28, color: 'rgba(27,36,48,0.1)' }, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 24, y: 216, w: 60, h: 44, html: fa(i + 1), fontSize: 30, fontWeight: 800, color: castColors[i], align: 'center', fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 24, y: 284, w: 288, h: 80, html: t, fontSize: 23, fontWeight: 800, color: INKT, lineHeight: 1.4, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: cx + 24, y: 380, w: 288, h: 110, html: d, fontSize: 15.5, color: SOFT, lineHeight: 1.7, fx: { enter: 'fade-up', order: i } }),
+        ]
+      }),
+      pg(8),
+    ],
+  })
+
+  const s9 = slide({
+    id: 'nb-close', background: FOG, transition: 'morph',
+    notes: 'بیت morph سوم: قیف به ردیف چهار رنگ جمع می‌شود؛ دو هدف پاییز و پایان.',
+    elements: [
+      ...cast.map((c, i) => shape('rect', { id: c, x: 566 + i * 42, y: 200, w: 26, h: 26, radius: 8, fill: castColors[i] })),
+      ftext({ x: 96, y: 280, w: 1088, h: 95, html: 'پاییز: دو هدف، یک گلوگاه.', fontSize: 64, fontWeight: 800, color: INKT, align: 'center' }),
+      ftext({ x: 296, y: 430, w: 688, h: 92, html: '۱ — نرخ خرید را از ۹٪ به ۱۲٪ برسانیم<br>۲ — رشد «سایر» مناطق را دو رقمی کنیم', fontSize: 20, color: SOFT, align: 'center', lineHeight: 1.8 }),
+      ftext({ x: 296, y: 640, w: 688, h: 24, html: 'نبض — محصولی فرضی برای یک قالب واقعی', fontSize: 12, color: 'rgba(27,36,48,0.4)', align: 'center' }),
+      pg(9),
+    ],
+  })
+
+  return doc({
+    title: 'نبض — قالب گزارش داده', withFonts: ['Vazirmatn'],
+    theme: { background: FOG, color: INKT, accent: BLUE, fontFamily: VZ },
+    present: { progress: true },
+    slides: [s1, s2, s3, s4, s5, s6, s7, s8, s9],
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DECK L · «سفید» — مینیمال سوئیسی (Swiss-minimal keynote, Farsi/RTL)
+// Broken-white, ink, ONE cobalt accent. The style is restraint: two display
+// sizes, hairlines, a strict grid — and exactly three deliberate morphs
+// (cover→manifesto, principles→type specimen, quote→close). Restraint is the
+// art direction here; the morph bar is the only travelling element.
+// ═══════════════════════════════════════════════════════════════════════
+function deckSafid() {
+  const PAPER = '#F4F3EF', INK = '#141414', COBALT = '#2244EE'
+  const SOFT = 'rgba(20,20,20,0.55)', HAIR = 'rgba(20,20,20,0.16)'
+  const kick = (s) => ftext({ x: 384, y: 84, w: 800, h: 26, html: s, fontSize: 14, fontWeight: 700, color: COBALT })
+  const pg = (n, light) => text({ x: 96, y: 654, w: 80, h: 24, html: fa(n), fontSize: 13, fontWeight: 600, color: light ? 'rgba(244,243,239,0.6)' : SOFT, align: 'left', fontFamily: VZ })
+
+  const s1 = slide({
+    id: 'sf-cover', background: PAPER, transition: 'none',
+    notes: 'قالب — «سفید»، مینیمال سوئیسی. یک رنگ اکسنت (کبالت)، خطوط مویی، دو اندازهٔ تایپ. morph عمداً کم است — سه بیت دقیق؛ خویشتن‌داری بخشی از جهت هنری این قالب است.',
+    elements: [
+      ftext({ x: 96, y: 84, w: 500, h: 26, html: 'استودیو سفید — مانیفست طراحی ۱۴۰۵', fontSize: 14, fontWeight: 600, color: SOFT, align: 'left' }),
+      shape('rect', { x: 96, y: 130, w: 500, h: 1.5, fill: HAIR }),
+      ftext({ id: 'sf-title', x: 96, y: 300, w: 1088, h: 260, html: 'سفید', fontSize: 200, fontWeight: 800, color: INK, lineHeight: 1 }),
+      shape('rect', { id: 'sf-bar', x: 96, y: 596, w: 48, h: 16, fill: COBALT }),
+      ftext({ x: 660, y: 590, w: 524, h: 30, html: 'فضای خالی، بخشی از جمله است.', fontSize: 16, color: SOFT }),
+      pg(1),
+    ],
+  })
+
+  const s2 = slide({
+    id: 'sf-manifesto', background: PAPER, transition: 'morph',
+    notes: 'بیت morph اول: «سفید» کوچک می‌شود و بالا می‌نشیند؛ مربع کبالت به خطِ زیرِ جمله تبدیل می‌شود — تنها رنگ صفحه.',
+    elements: [
+      ftext({ id: 'sf-title', x: 884, y: 72, w: 300, h: 64, html: 'سفید', fontSize: 40, fontWeight: 800, color: SOFT }),
+      ftext({ x: 96, y: 240, w: 1088, h: 240, html: 'کم‌تر، ولی بهتر.<br>بقیه‌اش حاشیه است.', fontSize: 76, fontWeight: 800, color: INK, lineHeight: 1.45 }),
+      shape('rect', { id: 'sf-bar', x: 96, y: 500, w: 260, h: 10, fill: COBALT }),
+      ftext({ x: 460, y: 496, w: 724, h: 30, html: '— این دک هم با همین قاعده چیده شده است', fontSize: 15, color: SOFT }),
+      pg(2),
+    ],
+  })
+
+  const principles = [
+    'فاصله، خودش محتواست.',
+    'یک فونت، دو وزن.',
+    'رنگ باید دلیل داشته باشد.',
+    'شبکه را بشکن، اما عمداً.',
+  ]
+  const s3 = slide({
+    id: 'sf-principles', background: PAPER, transition: 'fade',
+    notes: 'چهار اصل — شمارهٔ لاتینِ کوچک سمت چپ، جملهٔ درشت راست‌چین، خط مویی زیر هر ردیف. نشان کبالت کنار آخرین اصل؛ در اسلاید بعد به میلهٔ نمونهٔ حروف می‌رود.',
+    elements: [
+      kick('چهار اصل'),
+      ...principles.flatMap((p, i) => [
+        text({ x: 96, y: 186 + i * 110, w: 60, h: 40, html: `0${i + 1}`, fontSize: 15, fontWeight: 600, color: SOFT, align: 'left', fontFamily: MONO }),
+        ftext({ x: 260, y: 168 + i * 110, w: 924, h: 60, html: p, fontSize: 40, fontWeight: 700, color: INK }),
+        shape('rect', { x: 96, y: 240 + i * 110, w: 1088, h: 1.5, fill: HAIR }),
+      ]),
+      shape('rect', { id: 'sf-bar', x: 1136, y: 498, w: 48, h: 10, fill: COBALT }),
+      pg(3),
+    ],
+  })
+
+  const s4 = slide({
+    id: 'sf-type', background: PAPER, transition: 'morph',
+    notes: 'بیت morph دوم: نشان کبالت از کنار اصل چهارم به کنار سطر ۴۸ می‌آید — حرکتِ کم اما دیده‌شدنی. نمونهٔ حروف: وزیرمتن از سیاه تا نازک.',
+    elements: [
+      kick('نمونهٔ حروف — وزیرمتن'),
+      ftext({ x: 96, y: 130, w: 1088, h: 220, html: 'الف', fontSize: 190, fontWeight: 800, color: INK, lineHeight: 1 }),
+      shape('rect', { x: 96, y: 372, w: 1088, h: 1.5, fill: HAIR }),
+      ftext({ x: 96, y: 400, w: 1088, h: 76, html: 'سیاه ۸۰۰ — برای وقتی حرف، خودش پوستر است', fontSize: 44, fontWeight: 800, color: INK }),
+      shape('rect', { id: 'sf-bar', x: 1184, y: 512, w: 48, h: 10, fill: COBALT }),
+      ftext({ x: 96, y: 500, w: 1040, h: 52, html: 'نیمه‌ضخیم ۶۰۰ — برای تیترهایی که فریاد نمی‌زنند', fontSize: 30, fontWeight: 600, color: INK }),
+      ftext({ x: 96, y: 574, w: 1088, h: 40, html: 'معمولی ۴۰۰ — بدنهٔ متن، همان‌قدر مهم', fontSize: 22, fontWeight: 400, color: INK }),
+      ftext({ x: 96, y: 630, w: 1088, h: 30, html: 'نازک ۲۰۰ — زیرنویس، فقط برای چشم‌های خسته', fontSize: 16, fontWeight: 200, color: SOFT }),
+      pg(4),
+    ],
+  })
+
+  const s5 = slide({
+    id: 'sf-grid', background: PAPER, transition: 'fade',
+    notes: 'نمایش شبکه — شش ستون با خط مویی؛ سه بلوک کبالت روی ستون‌ها. شبکه را با محتوای خودتان پر کنید.',
+    elements: [
+      kick('شبکه — شش ستون'),
+      ...[0, 1, 2, 3, 4, 5].map((i) => shape('rect', { x: 96 + i * 181.3, y: 160, w: 1.5, h: 380, fill: HAIR })),
+      shape('rect', { x: 1184 - 1.5, y: 160, w: 1.5, h: 380, fill: HAIR }),
+      shape('rect', { x: 96, y: 160, w: 1088, h: 1.5, fill: HAIR }),
+      shape('rect', { x: 96, y: 540, w: 1088, h: 1.5, fill: HAIR }),
+      shape('rect', { x: 1002.7, y: 200, w: 163, h: 300, fill: COBALT, opacity: 0.92 }),
+      ftext({ x: 1002.7, y: 330, w: 163, h: 34, html: '۱ ستون', fontSize: 15, fontWeight: 700, color: '#FFF', align: 'center' }),
+      shape('rect', { x: 640.1, y: 200, w: 326, h: 300, fill: COBALT, opacity: 0.75 }),
+      ftext({ x: 640.1, y: 330, w: 326, h: 34, html: '۲ ستون', fontSize: 15, fontWeight: 700, color: '#FFF', align: 'center' }),
+      shape('rect', { x: 96, y: 200, w: 507.4, h: 300, fill: COBALT, opacity: 0.55 }),
+      ftext({ x: 96, y: 330, w: 507.4, h: 34, html: '۳ ستون — یا هر ترکیب دیگر', fontSize: 15, fontWeight: 700, color: '#FFF', align: 'center' }),
+      ftext({ x: 96, y: 580, w: 1088, h: 30, html: 'عناصر لبه‌به‌لبه روی ستون می‌نشینند؛ فاصله‌ها مضرب شبکه‌اند.', fontSize: 16, color: SOFT }),
+      pg(5),
+    ],
+  })
+
+  const works = [
+    ['خانهٔ آبان', 'معماری داخلی', '۱۴۰۴'],
+    ['کتابِ شب', 'طراحی جلد و صفحات', '۱۴۰۳'],
+    ['کافهٔ مهر', 'هویت بصری', '۱۴۰۳'],
+    ['چرم رها', 'بسته‌بندی', '۱۴۰۲'],
+  ]
+  const s6 = slide({
+    id: 'sf-works', background: PAPER, transition: 'fade',
+    notes: 'فهرست کارها — ایندکس سوئیسی: نام، زمینه، سال. ردیف‌ها را با پروژه‌های واقعی‌تان عوض کنید.',
+    elements: [
+      kick('ایندکس کارها'),
+      ...works.flatMap(([t, d, y], i) => [
+        ftext({ x: 556, y: 172 + i * 108, w: 628, h: 52, html: t, fontSize: 34, fontWeight: 700, color: INK, fx: { enter: 'fade-up', order: i } }),
+        ftext({ x: 300, y: 184 + i * 108, w: 400, h: 34, html: d, fontSize: 16, color: SOFT, fx: { enter: 'fade-up', order: i } }),
+        text({ x: 96, y: 186 + i * 108, w: 120, h: 34, html: y, fontSize: 18, fontWeight: 700, color: COBALT, align: 'left', fontFamily: VZ, fx: { enter: 'fade-up', order: i } }),
+        shape('rect', { x: 96, y: 240 + i * 108, w: 1088, h: 1.5, fill: HAIR }),
+      ]),
+      pg(6),
+    ],
+  })
+
+  const s7 = slide({
+    id: 'sf-quote', background: COBALT, transition: 'fade',
+    notes: 'تنها صفحهٔ رنگی دک — نقل روی کبالت. مربع سفید کوچک پایین، در اسلاید پایان به زیرخطِ تیتر تبدیل می‌شود.',
+    elements: [
+      ftext({ x: 96, y: 250, w: 1088, h: 140, html: 'سفیدی، صدای طرح است.', fontSize: 88, fontWeight: 800, color: PAPER, align: 'center' }),
+      ftext({ x: 296, y: 440, w: 688, h: 32, html: '— دفتر طراحی سفید، ۱۴۰۵', fontSize: 17, color: 'rgba(244,243,239,0.7)', align: 'center' }),
+      shape('rect', { id: 'sf-bar', x: 616, y: 600, w: 48, h: 12, fill: PAPER }),
+      pg(7, true),
+    ],
+  })
+
+  const s8 = slide({
+    id: 'sf-close', background: PAPER, transition: 'morph',
+    notes: 'بیت morph سوم: مربعِ صفحهٔ نقل به زیرخط تیتر پایان می‌رسد و سفیدِ کبالت به کاغذ برمی‌گردد. ایمیل را عوض کنید.',
+    elements: [
+      ftext({ x: 96, y: 240, w: 1088, h: 140, html: 'پایانِ بخشِ اول.', fontSize: 96, fontWeight: 800, color: INK, align: 'center' }),
+      shape('rect', { id: 'sf-bar', x: 560, y: 420, w: 160, h: 10, fill: COBALT }),
+      ftext({ x: 296, y: 480, w: 688, h: 34, html: 'hello@safid.example — تهران، خیابان ولیعصر', fontSize: 19, color: SOFT, align: 'center' }),
+      ftext({ x: 296, y: 640, w: 688, h: 24, html: 'استودیو سفید — برندی فرضی برای یک قالب واقعی', fontSize: 12, color: 'rgba(20,20,20,0.4)', align: 'center' }),
+      pg(8),
+    ],
+  })
+
+  return doc({
+    title: 'سفید — قالب مینیمال سوئیسی', withFonts: ['Vazirmatn'],
+    theme: { background: PAPER, color: INK, accent: COBALT, fontFamily: VZ },
+    slides: [s1, s2, s3, s4, s5, s6, s7, s8],
+  })
+}
+
 // ——— splice + write ————————————————————————————————————————————————
 const outDir = process.argv[2] ?? join(root, 'working')
 mkdirSync(outDir, { recursive: true })
@@ -751,6 +2236,15 @@ for (const [file, build] of [
   ['terra-premium-product.bento.html', deckTerra],
   ['orbital-dark-immersive.bento.html', deckOrbital],
   ['picnic-playful.bento.html', deckPicnic],
+  // the Farsi template family — RTL, Vazirmatn, every deck morphs
+  ['helal-executive-report.bento.html', deckHelal],
+  ['shetab-startup-pitch.bento.html', deckShetab],
+  ['atelier-lecture.bento.html', deckAtelier],
+  ['namayesh-portfolio.bento.html', deckNamayesh],
+  ['jaraghe-launch.bento.html', deckJaraghe],
+  ['hamayesh-event.bento.html', deckHamayesh],
+  ['nabz-data-report.bento.html', deckNabz],
+  ['safid-minimal.bento.html', deckSafid],
 ]) {
   uid = 0
   const d = build()
