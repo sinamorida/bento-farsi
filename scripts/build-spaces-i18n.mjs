@@ -27,8 +27,16 @@ const srcDir = join(root, 'spaces/src')
 const i18nDir = join(srcDir, 'i18n')
 const OUT = join(i18nDir, 'packed.ts')
 
-/** Locale columns, in order. English is the key, so it is not a column. */
-export const LOCALES = ['ja', 'zh-Hans', 'zh-Hant', 'es', 'fr', 'de', 'it', 'pt']
+/**
+ * Locale columns, DERIVED from the catalog directory — never restated here
+ * (AGENTS.md rule 6: a restated list is how dash went a month without pt).
+ * Adding a language is adding a catalog file; the columns follow the
+ * directory, alphabetically, so the order is stable and nothing to maintain.
+ */
+export const LOCALES = readdirSync(i18nDir)
+  .filter((f) => f.endsWith('.ts') && f !== 'packed.ts')
+  .map((f) => f.replace(/\.ts$/, ''))
+  .sort()
 
 /**
  * Every `t('…')` in the app source.

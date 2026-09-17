@@ -48,7 +48,7 @@ import './ask.css'
 import { openColumnMenu } from './filterui.ts'
 import { installSaveMenu, adoptOpenedDoc, toast } from './saveui.ts'
 import { dismissSplash, dismissSplashNow } from './splash.ts'
-import { t, i18nApi } from './i18n.ts'
+import { t, i18nApi, applyDirection } from './i18n.ts'
 import {
   parseDoc, docBytes, docBudget, rowCount, DOC_BUDGET_FSA, DOC_BUDGET_DOWNLOAD,
   type DashDoc, type ParseResult, type Column, type ColumnType, type TableSheet,
@@ -162,6 +162,12 @@ configureApp({
 })
 
 capturePristine()
+
+// AFTER capturePristine, for the same reason spaces boots it there: the
+// pristine clone is what every save re-serializes, so dir/lang must not ride
+// into a saved file. The chrome mirrors for an RTL viewer (fa is this fork's
+// default); the workbook's cells do not.
+applyDirection()
 
 // The file-manager thumbnail. Registered BEFORE any save can happen: a save
 // that ran first would write a shell with no preview in it, and the next

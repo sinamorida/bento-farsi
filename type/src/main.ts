@@ -11,7 +11,7 @@ import {
   capturePristine, readEmbeddedDoc, saveFile, currentFileName, canWriteInPlace,
 } from '../../kernel/src/save.ts';
 import { ICONS } from './icons.ts';
-import { t } from './i18n.ts';
+import { t, applyDirection } from './i18n.ts';
 import { tools, menuItems, panels, matchKey, readyFns, paginatedFns, selectionFns, text as labelText, type FeatureContext } from './features.ts';
 import './registry.ts';   // side-effect: every feature module registers itself
 import { i18nApi } from '../../kernel/src/i18n.ts';
@@ -41,6 +41,10 @@ capturePristine();
 // Theme after the capture, for exactly that reason — `data-theme` is a viewer
 // preference and must not travel in the document.
 startTheme();
+
+// Same for dir/lang: the chrome mirrors for an RTL viewer (fa is this fork's
+// default), and neither attribute may ride into a saved file.
+applyDirection();
 
 // ───────────────────────────────────────────────────────────── the document
 

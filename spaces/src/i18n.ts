@@ -21,6 +21,7 @@ import { PACKED, PACKED_LOCALES } from './i18n/packed.ts'
 
 /** Offered in the About picker, each labelled in its own language. */
 const CHOICES: LocaleChoice[] = [
+  { code: 'fa', label: 'فارسی' },
   { code: 'en', label: 'English' },
   { code: 'ja', label: '日本語' },
   { code: 'zh-Hans', label: '简体中文' },

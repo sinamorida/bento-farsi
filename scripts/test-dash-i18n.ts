@@ -44,8 +44,18 @@ const srcDir = join(root, 'dash/src')
 const i18nDir = join(srcDir, 'i18n')
 const OUT = join(i18nDir, 'packed.ts')
 
-/** Locale columns, in order. English is the key, so it is never a column. */
-const LOCALES = ['ja', 'zh-Hans', 'zh-Hant', 'es', 'fr', 'de', 'it'] as const
+/**
+ * Locale columns, DERIVED from the catalog directory — never restated here.
+ * This rig is dash's packer, so a restated list grades its own output: the
+ * exact shape that shipped dash without Portuguese for a month, because a
+ * fourth copy of the list went stale while the catalogs moved on (AGENTS.md
+ * rule 6). Adding a language is adding a catalog file; the columns follow the
+ * directory, alphabetically, so the order is stable and nothing to maintain.
+ */
+const LOCALES = readdirSync(i18nDir)
+  .filter((f) => f.endsWith('.ts') && f !== 'packed.ts')
+  .map((f) => f.replace(/\.ts$/, ''))
+  .sort()
 
 /**
  * Strings that reach t() through a module const rather than as a literal.
@@ -120,6 +130,7 @@ const SAME_AS_ENGLISH: Record<string, string[]> = {
   ja: ['OK'],
   de: ['Dashboard', 'Format', 'Name', 'OK', 'Symbol', 'Text', 'Updates'],
   it: ['Dashboard', 'File', 'Formula', 'Max', 'Min', 'OK', 'vs', 'editor'],
+  pt: ['Total', 'OK', 'vs', 'editor'],
 }
 
 // --- sweeping the source -----------------------------------------------------
@@ -502,12 +513,19 @@ const probe = ['Save', 'Workbook', 'Pivot', 'Grand total']
 // kernel's base-language fallback (fr-CA -> fr) and this app's zh aliases,
 // without which a Taiwanese reader lands on English with zh-Hant right there.
 const RESOLVE: Array<[string, string]> = [
-  ['en-GB', 'en'], ['ja-JP', 'ja'], ['fr-CA', 'fr'], ['de-AT', 'de'],
+  ['ja-JP', 'ja'], ['fr-CA', 'fr'], ['de-AT', 'de'],
   ['it-CH', 'it'], ['es-MX', 'es'],
   ['zh-CN', 'zh-Hans'], ['zh-SG', 'zh-Hans'], ['zh', 'zh-Hans'],
   ['zh-TW', 'zh-Hant'], ['zh-HK', 'zh-Hant'], ['zh-MO', 'zh-Hant'],
-  ['pt-BR', 'en'],   // dash carries no pt: it must degrade, not guess
-  ['xx-YY', 'en'],
+  // Base-language fallback reaches pt and fa; pt-PT reads the Brazilian
+  // column the way slides maps it (docs/DECISIONS.md, 2026-08-29).
+  ['pt-BR', 'pt'], ['pt-PT', 'pt'],
+  ['fa-IR', 'fa'], ['fa-AF', 'fa'],
+  // bento-farsi is Persian-first: the kernel's resolve() falls back to fa
+  // whenever it is carried, so a viewer whose language is not among the
+  // columns — English included — lands on Persian and picks another language
+  // from the About picker.
+  ['en-GB', 'fa'], ['xx-YY', 'fa'],
 ]
 let resolveBad = 0
 for (const [nav, want] of RESOLVE) {

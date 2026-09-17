@@ -28,7 +28,13 @@ import { fileURLToPath } from 'node:url'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const srcDir = join(root, 'type/src')
 const i18nDir = join(srcDir, 'i18n')
-const LOCALES = ['ja', 'zh-Hans', 'zh-Hant', 'es', 'fr', 'de', 'it', 'pt']
+// Derived from the catalog directory — never restated (AGENTS.md rule 6).
+// Importing build-type-i18n.mjs instead would EXECUTE the packer, so this is
+// the same derivation spelled out; the directory is the single source.
+const LOCALES = readdirSync(i18nDir)
+  .filter((f) => f.endsWith('.ts') && f !== 'packed.ts')
+  .map((f) => f.replace(/\.ts$/, ''))
+  .sort()
 
 let failures = 0
 let checks = 0
