@@ -7238,3 +7238,59 @@ The experimental alphabets stay in `scripts/lib/b86.mjs` behind
 the b86 decoder alone, verified by grep on the built shell), and the
 diagnostic panel stays behind `--diag`. Default: b86, cascade, no panel.
 
+
+## 2026-09-17 — fa is the default everywhere, and every locale list is derived
+
+bento-farsi existed as a Persian shell over an English suite: only slides
+carried a fa catalog, while dash, spaces and type stayed English for the
+Persian users they were forked for. All three now bundle fa (743, 597 and 399
+strings, machine-drafted in the slides fa.ts orthography — ک/ی, ZWNJ, no bidi
+controls, Western digits), and the kernel's resolve() already fell back to fa
+when present, so each app now boots Persian for a viewer with no matching
+language. English remains one picker click away and is persisted per browser,
+never in the file.
+
+The dash incident that AGENTS.md rule 6 records — a fourth restated copy of
+the locale list shipping seven while the catalogs said eight — is closed by
+removing the copies rather than by correcting them: dash's rig/generator,
+`build-spaces-i18n.mjs` and `build-type-i18n.mjs` now derive their locale
+columns from the catalog directory itself, so adding a language is adding a
+catalog file. The type rig derived its list the same way after it failed
+exactly as the doctrine predicts (its restated list disagreed with the
+reordered packed columns and reported 3,142 mismatched cells). slides'
+`build-i18n.mjs` keeps its restated list because it errors on a catalog
+missing from it — the error IS the feature.
+
+Chrome follows the viewer in every app now, wired the way spaces already did:
+`applyDirection()` after `capturePristine()`, so dir/lang ride on `<html>`
+only and never reach a saved file. dash's panels.css was written with logical
+properties against this day ("the chrome mirrors for an RTL viewer") — the
+call just had never been wired.
+
+## 2026-09-17 — cssFont's length bound is not the guard; the character class is
+
+The Persian default font stack (191 chars, ten families) exceeded cssFont's
+160-char bound, so every table in every deck silently rendered
+`font-family:inherit` — the sanitizer rig's "the deck's font stack survives"
+was the only witness, and CI was too red to listen to it. The bound moved to
+256 with the reasoning written where the next person will read it: the
+character class `[;{}<>()\\]` is what stops a style attribute from escaping
+into markup; the length only caps the attribute, and it has to sit above the
+longest legitimate stack an app actually ships. Decks saved with the long
+stack keep their tables in the deck font. FONT_STACK itself is unchanged —
+shortening it would have fixed new decks and abandoned the shipped ones.
+
+## 2026-09-17 — the published shell must prove it is Persian before it is copied
+
+`Bento_Slides_Farsi.bento.html` — the file the fork publishes — was built by
+tribal knowledge: build slides, copy to the root, rename. Nothing verified the
+copy, and the working tree indeed held a stale pre-1.2.0 dist-single while the
+root artifact claimed otherwise. `scripts/build-farsi-shell.mjs` now owns the
+step and refuses to copy a shell it cannot prove opens Persian. The proof has
+to be a browser because the shell is self-compressing: a grep over the file
+finds not one Arabic-script byte even when everything is correct, since the fa
+catalog, the Vazirmatn font and the Persian starter deck all live inside the
+deflated block. So the script boots the built shell in headless Chrome and
+requires `lang="fa" dir="rtl"` on `<html>` — which is only reachable when the
+fa catalog registered and resolve() chose it — after the splice gate passes.
+A refused copy is the point.

@@ -14,5 +14,12 @@ merge.
 
 Keep Persian in the bundled catalog (`slides/src/i18n/fa.ts`). Transfer any
 upstream `slides/src/i18n/packs/fa.ts` changes there and regenerate `packed.ts`;
-do not reintroduce a duplicate Persian pack. Rebuild the root standalone HTML
-and versioned language packs after integrating source changes.
+do not reintroduce a duplicate Persian pack. After integrating source
+changes, rebuild the published artifacts:
+
+    node scripts/build-farsi-shell.mjs     # slides build → Bento_Slides_Farsi.bento.html (browser-proven Persian)
+    node scripts/build-i18n.mjs --packs    # versioned language packs
+
+`build-farsi-shell.mjs` refuses to copy a shell it cannot prove opens Persian
+(it boots it in headless Chrome and requires lang="fa" dir="rtl"), so a stale
+`dist-single` cannot silently become the published file.

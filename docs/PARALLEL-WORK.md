@@ -9,8 +9,8 @@ rules exist to keep N parallel workstreams from dissolving into merge hell.
 
 ## 1. Ownership zones
 
-- **App zones** — `slides/` (shipped) and `spaces/` (scaffold); `dash/` when
-  it lands. Parallel work is safe *within different apps*. Agents working on
+- **App zones** — `slides/`, `dash/`, `spaces/` and `type/`, all shipped
+  (`vault/` does not exist yet). Parallel work is safe *within different apps*. Agents working on
   different apps must not touch each other's app directories. Each app owns
   its own `package.json`, `vite.config.ts`, `index.html`, `src/model.ts` and
   `src/i18n.ts` facade.

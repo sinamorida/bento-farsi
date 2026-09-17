@@ -11,6 +11,27 @@ pre-1.0.
 
 ## [Unreleased]
 
+### bento-farsi — Persian suite (fork)
+
+- **fa is bundled in every app.** dash (743 strings), spaces (597) and type
+  (399) join slides in carrying a machine-drafted Persian catalog (native
+  review welcome); the orthography rules live in each catalog's header. The
+  kernel's Persian-first fallback now resolves to fa in all four apps, and the
+  chrome mirrors RTL in dash and type the way spaces and slides already did —
+  applied after the pristine capture, so dir/lang never reach a saved file.
+- **dash carries Brazilian Portuguese again.** The locale lists are derived
+  from the catalog directories now (dash's rig/generator, spaces and type
+  build scripts and the type rig), closing the incident in AGENTS.md rule 6;
+  adding a language is adding a catalog file.
+- **Tables keep the deck's font again.** cssFont's 160-char bound rejected the
+  191-char Persian default stack and every table fell back to `inherit`; the
+  bound is 256, above the longest legitimate stack any app ships.
+- **`Bento_Slides_Farsi.bento.html` is built by a script** that boots the
+  built shell in headless Chrome and refuses to publish anything that does not
+  open as `lang="fa" dir="rtl"` (`scripts/build-farsi-shell.mjs`).
+- The Farsi regression rigs (`test-slides-farsi.ts`, `test-slides-panel-i18n.ts`)
+  are registered in CI, where they should have been from the start.
+
 ## [1.2.0] — 2026-09-16
 
 - **A deck opens inside Teams and SharePoint again.** Their viewer refuses
