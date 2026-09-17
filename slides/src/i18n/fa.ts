@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 The Bento authors
-// Persian (Farsi) — a LANGUAGE PACK, not bundled: nothing imports this file,
-// so it never enters the module graph. scripts/build-i18n.mjs --packs emits it
-// as downloadable JSON. See docs/i18n-packs.md.
+// Persian (Farsi) — BUNDLED: `fa` is in LOCALES in scripts/build-i18n.mjs and
+// is a column of ./packed.ts, so this file ships inside every shell and no
+// downloadable pack is emitted for it (the build aborts on a language that is
+// both bundled and a pack). This file is the reviewable source of truth; edit
+// here, then regenerate: node scripts/build-i18n.mjs
 //
 // Persian is right-to-left, and unlike the Hebrew pack — the first RTL one,
 // written while the shell still laid out LTR — it lands in a shell that

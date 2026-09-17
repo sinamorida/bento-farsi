@@ -82,6 +82,21 @@ jobs:
         # and re-publishable on their own, so they get a floor and a report.
         run: node scripts/test-i18n-coverage.mjs
 
+      - name: Authored Persian typography
+        # The Persian defaults live in the RUNTIME, not only in the fa catalog:
+        # starter-deck prose must be right-aligned, kickers must carry zero
+        # letter-spacing, and Farsi inserts need line-height 1.35. Commit
+        # 3bf2de9 shipped the catalog with none of that runtime behavior, and
+        # the rig that would have caught it sat on disk unwired — which is
+        # exactly the failure test-ci-registered.ts exists to prevent.
+        run: node scripts/test-slides-farsi.ts
+
+      - name: Persian panel strings
+        # Panels and tooltips across the 9 core catalogs and 21 packs. The rig
+        # checks ROW_TIPS VALUES, not labels — the first draft of this rig
+        # compared labels and passed green while the tooltips stayed English.
+        run: node scripts/test-slides-panel-i18n.ts
+
       - name: Language packs build and index cleanly
         # Emits every pack and builds the index payload WITHOUT signing (--dry
         # writes nothing and needs no key — signing stays local, see the header).
